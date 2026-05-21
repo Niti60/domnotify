@@ -55,7 +55,7 @@ export default function WhoisPage() {
           className="mb-12"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+            <div className="p-3 rounded-xl bg-linear-to-br from-purple-500/20 to-pink-500/20">
               <Globe className="w-6 h-6 text-purple-600 dark:text-pink-400" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
@@ -80,9 +80,9 @@ export default function WhoisPage() {
         {/* Results */}
         {whoisData && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 mb-8">
+            <Card className="bg-linear-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 mb-8">
               {/* Terminal style header */}
-              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10 dark:border-white/20">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
@@ -150,7 +150,7 @@ export default function WhoisPage() {
                   <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
                     Registrant Information
                   </p>
-                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+                  <div className="bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-800 p-4 rounded-lg">
                     <p className="text-sm">
                       <span className="font-semibold text-slate-900 dark:text-white">
                         Name:

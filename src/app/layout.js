@@ -1,20 +1,24 @@
-'use client';
-
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { Providers } from '@/components/theme/ThemeProvider';
+import { LayoutWrapper } from '@/components/layout/LayoutWrapper';
 import './globals.css';
+
+export const metadata = {
+  title: 'DomNotify - Domain Intelligence Platform',
+  description: 'Monitor domains, track SSL, compare registrars, and get AI suggestions for your domain portfolio.',
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="description" content="DomInfo - Find Everything About Any Domain" />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.svg" />
       </head>
-      <body className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors">
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+      <body className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-300">
+        <Providers>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </Providers>
       </body>
     </html>
   );

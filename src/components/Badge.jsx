@@ -9,7 +9,7 @@ export default function Badge({ children, variant = 'default', className, ...pro
     warning: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300',
     danger: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300',
     purple: 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300',
-    gradient: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white',
+    gradient: 'bg-linear-to-r from-blue-500 to-cyan-500 text-white',
   };
 
   return (
