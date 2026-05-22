@@ -27,16 +27,13 @@ export function ThemeToggle() {
       whileTap={{ scale: 0.98 }}
       onClick={() => setTheme(nextTheme)}
       aria-label={`Switch to ${nextTheme} mode`}
-      className="inline-flex h-12 items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:bg-white/10 dark:border-white/10 dark:bg-slate-950 dark:text-white dark:hover:bg-white/5"
+      className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:bg-white/10 dark:border-white/10 dark:bg-slate-950 dark:text-white dark:hover:bg-white/5"
     >
-      <span className="flex items-center gap-2">
-        {activeTheme === 'dark' ? (
-          <Sun className="h-5 w-5 text-amber-300" />
-        ) : (
-          <Moon className="h-5 w-5 text-slate-600" />
-        )}
-        <span></span>
-      </span>
+      {activeTheme === 'dark' ? (
+        <Sun className="h-5 w-5 text-amber-300" />
+      ) : (
+        <Moon className="h-5 w-5 text-slate-600" />
+      )}
     </motion.button>
   );
 }

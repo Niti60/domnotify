@@ -70,20 +70,14 @@ export default function UptimeMonitorPage() {
       </div>
 
       <DashboardCard title="Uptime Trend">
-        <div className="h-[320px] min-h-[320px]">
+        <div className="h-80 min-h-80">
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart data={uptimeData}>
-              <defs>
-                <linearGradient id="uptimeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                </linearGradient>
-              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" />
               <XAxis dataKey="time" />
               <YAxis domain={[99, 100]} />
               <Tooltip />
-              <Area type="monotone" dataKey="uptime" stroke="#3b82f6" fill="url(#uptimeGradient)" strokeWidth={3} />
+              <Area type="monotone" dataKey="uptime" stroke="#3b82f6" fill="#eff6ff" strokeWidth={3} />
             </AreaChart>
           </ResponsiveContainer>
         </div>

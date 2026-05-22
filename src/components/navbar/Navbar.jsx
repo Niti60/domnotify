@@ -35,7 +35,7 @@ export function Navbar({ onMenuClick }) {
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br from-blue-600 to-violet-600 text-white font-semibold text-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-white font-semibold text-sm dark:bg-white dark:text-slate-950">
               D
             </div>
             <div className="hidden sm:block">

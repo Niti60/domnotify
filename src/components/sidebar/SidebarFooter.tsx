@@ -11,7 +11,7 @@ interface SidebarFooterProps {
 
 export function SidebarFooter({ collapsed = false, onClose }: SidebarFooterProps) {
   return (
-    <div className="border-t border-white/10 px-4 py-5 dark:border-white/10">
+    <div className="border-t border-slate-200/10 px-4 py-5 dark:border-white/10">
       <Link href="/settings" onClick={onClose}>
         <div className="group flex items-center gap-3 rounded-2xl px-3 py-3 text-slate-700 transition-all duration-200 hover:bg-white/5 dark:text-slate-300 dark:hover:bg-white/5">
           <Settings className="h-5 w-5" />

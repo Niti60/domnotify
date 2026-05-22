@@ -25,8 +25,7 @@ export default function SearchBar({ onSearch, placeholder = 'Enter domain name..
         className="relative max-w-2xl mx-auto"
       >
         <div className="relative group">
-          <div className="absolute -inset-0.5 bg-linear-to-r from-blue-500/50 to-cyan-500/50 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-300 dark:opacity-25"></div>
-          <div className="relative bg-(--surface) dark:bg-slate-950 rounded-2xl shadow-2xl">
+          <div className="relative rounded-2xl bg-white border border-slate-200 shadow-sm dark:bg-zinc-950 dark:border-zinc-800">
             <div className="flex items-center gap-3 px-6 py-4">
               <Search className="w-5 h-5 text-slate-400" />
               <input
@@ -42,7 +41,7 @@ export default function SearchBar({ onSearch, placeholder = 'Enter domain name..
                 type="submit"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="hidden sm:flex items-center gap-2 px-6 py-2 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium hover:shadow-lg transition-all"
+                className="hidden sm:flex items-center gap-2 px-6 py-2 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-800 transition-all"
               >
                 Search
                 <ArrowRight className="w-4 h-4" />
@@ -57,10 +56,10 @@ export default function SearchBar({ onSearch, placeholder = 'Enter domain name..
   return (
     <form onSubmit={handleSearch} className="w-full">
       <div
-        className={`relative flex items-center gap-3 px-4 py-3 rounded-xl bg-(--surface) dark:bg-slate-950 border-2 transition-all ${
+        className={`relative flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-zinc-950 border-2 transition-all ${
           isFocused
             ? 'border-blue-500 dark:border-cyan-500'
-            : 'border-white/10 dark:border-white/10'
+            : 'border-slate-200 dark:border-zinc-800'
         }`}
       >
         <Search className="w-4 h-4 text-slate-400" />

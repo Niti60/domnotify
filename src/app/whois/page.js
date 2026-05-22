@@ -55,8 +55,8 @@ export default function WhoisPage() {
           className="mb-12"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-xl bg-linear-to-br from-purple-500/20 to-pink-500/20">
-              <Globe className="w-6 h-6 text-purple-600 dark:text-pink-400" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-slate-100 text-slate-900 dark:bg-zinc-900 dark:text-slate-100">
+              <Globe className="w-6 h-6" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
               WHOIS Checker
@@ -80,7 +80,7 @@ export default function WhoisPage() {
         {/* Results */}
         {whoisData && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="bg-linear-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 mb-8">
+            <Card className="bg-white border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 mb-8">
               {/* Terminal style header */}
               <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10 dark:border-white/20">
                 <div className="flex gap-2">

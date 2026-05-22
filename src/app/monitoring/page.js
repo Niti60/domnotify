@@ -20,7 +20,45 @@ export default function MonitoringPage() {
         subtitle="Track expiry, renewal costs, and domain health in one central view."
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="space-y-6">
+        <Card className="space-y-5">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Renewal budget</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Forecast your upcoming registrar and SSL renewal spend.</p>
+          <div className="rounded-3xl border border-white/10 bg-(--surface) p-5 dark:border-white/10 dark:bg-slate-950/95">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Next 30 days</p>
+            <p className="mt-3 text-4xl font-semibold text-slate-900 dark:text-white">$382</p>
+            <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-400">
+              <p>2 domains expire in the next 10 days</p>
+              <p>1 certificate renewal is due soon</p>
+            </div>
+          </div>
+          <Button fullWidth>Review renewal plan</Button>
+        </Card>
+
+        <Card className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Monitoring overview</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Renewal and status highlights for your core domains.</p>
+          </div>
+          <div className="space-y-4 rounded-3xl border border-white/10 bg-(--surface) p-5 dark:border-white/10 dark:bg-slate-950/95">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Due in next 30 days</p>
+                <p className="text-2xl font-semibold text-slate-900 dark:text-white">2 domains</p>
+              </div>
+              <StatusBadge variant="warning">Review</StatusBadge>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">High priority alerts</p>
+                <p className="text-2xl font-semibold text-slate-900 dark:text-white">1</p>
+              </div>
+              <StatusBadge variant="danger">Action required</StatusBadge>
+            </div>
+          </div>
+          <Button fullWidth>Manage monitoring</Button>
+        </Card>
+
         <Card className="space-y-5">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -56,30 +94,6 @@ export default function MonitoringPage() {
               </tbody>
             </table>
           </div>
-        </Card>
-
-        <Card className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Monitoring overview</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Renewal and status highlights for your core domains.</p>
-          </div>
-          <div className="space-y-4 rounded-3xl border border-white/10 bg-(--surface) p-5 dark:border-white/10 dark:bg-slate-950/95">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Due in next 30 days</p>
-                <p className="text-2xl font-semibold text-slate-900 dark:text-white">2 domains</p>
-              </div>
-              <StatusBadge variant="warning">Review</StatusBadge>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">High priority alerts</p>
-                <p className="text-2xl font-semibold text-slate-900 dark:text-white">1</p>
-              </div>
-              <StatusBadge variant="danger">Action required</StatusBadge>
-            </div>
-          </div>
-          <Button fullWidth>Manage monitoring</Button>
         </Card>
       </div>
     </div>

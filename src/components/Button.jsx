@@ -13,7 +13,7 @@ export default function Button({
 }) {
   const variants = {
     primary:
-      'bg-linear-to-r from-blue-500 to-cyan-500 text-white hover:shadow-lg hover:shadow-blue-500/30',
+      'bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-zinc-200 transition-all duration-200',
     secondary:
       'bg-white/5 dark:bg-white/10 text-slate-900 dark:text-white border border-white/10 hover:bg-white/10 dark:hover:bg-white/10',
     ghost:

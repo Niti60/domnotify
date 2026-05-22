@@ -15,7 +15,7 @@ export function Sidebar({ collapsed, onToggle }) {
     >
       <div className="mb-6 flex items-center justify-between gap-3 px-2">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-blue-600 to-cyan-600 text-white font-semibold">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white font-semibold dark:bg-white dark:text-slate-950">
             D
           </div>
           {!collapsed && (
@@ -53,7 +53,7 @@ export function Sidebar({ collapsed, onToggle }) {
                 <span
                   className={`flex h-11 w-11 items-center justify-center rounded-2xl transition-colors duration-200 ${
                     active
-                      ? 'bg-linear-to-br from-blue-600 to-cyan-600 text-white'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950'
                       : 'bg-white/10 text-slate-700 dark:bg-white/10 dark:text-white/70'
                   }`}
                 >
