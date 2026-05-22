@@ -9,7 +9,7 @@ export function LayoutWrapper({ children }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-(--background) text-(--foreground)">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar onMenuClick={() => setMobileNavOpen(true)} />
       <Sidebar />
       <MobileSidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />

@@ -56,11 +56,10 @@ export default function SearchBar({ onSearch, placeholder = 'Enter domain name..
   return (
     <form onSubmit={handleSearch} className="w-full">
       <div
-        className={`relative flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-zinc-950 border-2 transition-all ${
-          isFocused
+        className={`relative flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-zinc-950 border-2 transition-all ${isFocused
             ? 'border-blue-500 dark:border-cyan-500'
             : 'border-slate-200 dark:border-zinc-800'
-        }`}
+          }`}
       >
         <Search className="w-4 h-4 text-slate-400" />
         <input

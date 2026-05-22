@@ -1,20 +1,22 @@
-export function Input({ label, error, ...props }) {
+import { cn } from '@/lib/cn';
+
+export function Input({ label, error, className = '', ...props }) {
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+        <label className="mb-2 block text-sm font-medium text-foreground">
           {label}
         </label>
       )}
       <input
-        className={`w-full rounded-lg border bg-(--surface) dark:bg-slate-950 px-4 py-2 text-slate-900 dark:text-white placeholder-slate-400 transition-all duration-200 focus:outline-none focus:ring-2 ${
-          error
-            ? 'border-red-300 focus:ring-red-500/50 dark:border-red-700'
-            : 'border-slate-200 focus:ring-blue-500/50 dark:border-white/10'
-        }`}
+        className={cn(
+          'w-full rounded-lg border bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring/40',
+          error ? 'border-destructive focus:ring-destructive/40' : 'border-input',
+          className,
+        )}
         {...props}
       />
-      {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
     </div>
   );
 }

@@ -48,19 +48,23 @@ export default function DomainsPage() {
             <DashboardCard key={section.title}>
               <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-4">
-                  <div className="rounded-3xl bg-white/5 p-4 text-slate-700 dark:bg-white/10 dark:text-slate-200">
+                  <div className="rounded-lg bg-muted p-4 text-foreground">
                     <Icon className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-lg font-semibold text-slate-900 dark:text-white">{section.title}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{section.description}</p>
+                    <p className="text-lg font-semibold text-foreground">{section.title}</p>
+                    <p className="text-sm text-muted-foreground">{section.description}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <Link href={section.href}>
-                    <Button variant="primary" size="sm">Open</Button>
+                    <Button variant="primary" size="sm">
+                      Open
+                    </Button>
                   </Link>
-                  <span className="text-xs uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Integrated</span>
+                  <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                    Integrated
+                  </span>
                 </div>
               </div>
             </DashboardCard>

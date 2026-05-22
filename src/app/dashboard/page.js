@@ -8,7 +8,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { dashboardStats, expiringDomains, monitoringDomains, watchlistDomains, recentActivity } from '@/data/dummyData';
 
 const statusMap = {
-  Active: 'success',
+  Available: 'success',
   Review: 'warning',
   Pending: 'danger',
 };
@@ -21,12 +21,12 @@ export default function DashboardPage() {
         subtitle="Get a quick view of your domain portfolio health, upcoming renewals, and critical alerts."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {dashboardStats.map((stat) => (
           <Card key={stat.label} className="space-y-3">
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.label}</p>
+            <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
             <div className="flex items-center justify-between gap-4">
-              <p className="text-3xl font-semibold text-slate-900 dark:text-white">{stat.value}</p>
+              <p className="text-3xl font-semibold text-foreground tracking-tight">{stat.value}</p>
               <Badge variant="info">{stat.detail}</Badge>
             </div>
           </Card>
@@ -37,8 +37,8 @@ export default function DashboardPage() {
         <Card className="space-y-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Expiring domains</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">See the domains that need renewal soon.</p>
+              <h2 className="text-lg font-semibold text-foreground">Expiring domains</h2>
+              <p className="text-sm text-muted-foreground">See the domains that need renewal soon.</p>
             </div>
             <Button variant="ghost" size="sm">
               View all
@@ -47,11 +47,11 @@ export default function DashboardPage() {
 
           <div className="space-y-3">
             {expiringDomains.map((domain) => (
-              <div key={domain.domain} className="rounded-3xl border border-white/10 bg-(--surface) p-4 dark:border-white/10 dark:bg-slate-950/95">
+              <div key={domain.domain} className="rounded-lg border border-border bg-muted p-4 transition-colors duration-200">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white">{domain.domain}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Expires {domain.expiry} · {domain.registrar}</p>
+                    <p className="text-base font-semibold text-foreground">{domain.domain}</p>
+                    <p className="text-sm text-muted-foreground">Expires {domain.expiry} · {domain.registrar}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <StatusBadge variant={domain.daysLeft <= 10 ? 'danger' : 'warning'}>
@@ -71,33 +71,33 @@ export default function DashboardPage() {
       <Card className="space-y-5">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Domain monitoring</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Live status for your active domains.</p>
+            <h2 className="text-lg font-semibold text-foreground">Domain monitoring</h2>
+            <p className="text-sm text-muted-foreground">Live status for your available domains.</p>
           </div>
           <Badge variant="info">Updated 6 minutes ago</Badge>
         </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-white/10 text-slate-500 dark:border-white/10 dark:text-slate-400">
+            <thead className="border-b border-border text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Domain</th>
-                <th className="px-4 py-3">Registrar</th>
-                <th className="px-4 py-3">Expires</th>
-                <th className="px-4 py-3">Renewal</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Last checked</th>
+                <th className="px-4 py-3 font-semibold">Domain</th>
+                <th className="px-4 py-3 font-semibold">Registrar</th>
+                <th className="px-4 py-3 font-semibold">Expires</th>
+                <th className="px-4 py-3 font-semibold">Renewal</th>
+                <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 font-semibold">Last checked</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            <tbody className="divide-y divide-border">
               {monitoringDomains.map((domain) => (
-                <tr key={domain.domain} className="hover:bg-white/5 dark:hover:bg-white/10 transition">
-                  <td className="px-4 py-4 font-medium text-slate-900 dark:text-white">{domain.domain}</td>
-                  <td className="px-4 py-4 text-slate-600 dark:text-slate-400">{domain.registrar}</td>
-                  <td className="px-4 py-4 text-slate-600 dark:text-slate-400">{domain.expires}</td>
-                  <td className="px-4 py-4 text-slate-600 dark:text-slate-400">{domain.renewal}</td>
+                <tr key={domain.domain} className="transition-colors duration-200 hover:bg-black/5 dark:hover:bg-white/5">
+                  <td className="px-4 py-4 font-medium text-foreground">{domain.domain}</td>
+                  <td className="px-4 py-4 text-muted-foreground">{domain.registrar}</td>
+                  <td className="px-4 py-4 text-muted-foreground">{domain.expires}</td>
+                  <td className="px-4 py-4 text-muted-foreground">{domain.renewal}</td>
                   <td className="px-4 py-4"><StatusBadge variant={statusMap[domain.status] || 'info'}>{domain.status}</StatusBadge></td>
-                  <td className="px-4 py-4 text-slate-600 dark:text-slate-400">{domain.lastChecked}</td>
+                  <td className="px-4 py-4 text-muted-foreground">{domain.lastChecked}</td>
                 </tr>
               ))}
             </tbody>
@@ -108,25 +108,29 @@ export default function DashboardPage() {
       <Card className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Watchlist alerts</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Important domains you are tracking.</p>
+            <h2 className="text-lg font-semibold text-foreground">Watchlist alerts</h2>
+            <p className="text-sm text-muted-foreground">Important domains you are tracking.</p>
           </div>
           <Button size="sm" variant="secondary">Manage watchlist</Button>
         </div>
 
         <div className="space-y-3">
-          {watchlistDomains.map((domain) => (
-            <div key={domain.domain} className="flex flex-col gap-3 rounded-3xl border border-white/10 bg-(--surface) p-4 dark:border-white/10 dark:bg-slate-950/95 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-semibold text-slate-900 dark:text-white">{domain.domain}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Score {domain.score}% · {domain.status}</p>
+          {watchlistDomains.map((domain) => {
+            const expired = domain.status === 'Expired';
+            return (
+              <div key={domain.domain} className="flex flex-col gap-3 rounded-lg border border-border bg-muted p-4 transition-colors duration-200 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-semibold text-foreground">{domain.domain}</p>
+                  <p className="text-sm text-muted-foreground">Score {domain.score}% · {domain.registrar} · Expires {domain.expiry}</p>
+                  {expired && <p className="mt-1 text-xs text-destructive font-medium">Already expired</p>}
+                </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <StatusBadge variant={domain.status === 'Available' ? 'success' : domain.status === 'Expiring soon' ? 'warning' : 'danger'}>{domain.status}</StatusBadge>
+                  <p className="text-sm font-semibold text-foreground">{domain.price}</p>
+                </div>
               </div>
-              <div className="flex items-center gap-3 flex-wrap">
-                <Badge variant={domain.status === 'Available' ? 'success' : 'warning'}>{domain.status}</Badge>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">{domain.price}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
     </div>

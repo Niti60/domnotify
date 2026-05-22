@@ -1,10 +1,10 @@
-import { LayoutDashboard, Search, Activity, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Search, Activity, DollarSign, Eye } from 'lucide-react';
 
 export const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/monitoring', label: 'Monitoring', icon: Activity },
   { href: '/search-domain', label: 'Search Domain', icon: Search },
-  { href: '/pricing', label: 'Pricing', icon: DollarSign },
+  { href: '/watchlist', label: 'Watchlist', icon: Eye },
 ];
 
 export function isActive(pathname, href) {

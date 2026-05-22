@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
@@ -6,14 +6,21 @@ import { useEffect } from 'react';
 import { SidebarItem } from '@/components/sidebar/SidebarItem';
 import { SidebarFooter } from '@/components/sidebar/SidebarFooter';
 import { X } from 'lucide-react';
-import { navItems, isActive as isPrimaryActive } from '@/lib/navItems';
-import { ShieldAlert, Globe, Building, Eye } from 'lucide-react';
+import { isActive as isPrimaryActive } from '@/lib/navItems';
+import { LayoutDashboard, Search, Activity, ShieldAlert, Globe, Building, Eye, DollarSign } from 'lucide-react';
+
+const primaryItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/monitoring', label: 'Monitoring', icon: Activity },
+  { href: '/watchlist', label: 'Watchlist', icon: Eye },
+  { href: '/search-domain', label: 'Search Domain', icon: Search },
+  { href: '/pricing', label: 'Pricing', icon: DollarSign },
+];
 
 const secondaryItems = [
   { href: '/ssl-monitor', label: 'SSL Monitor', icon: ShieldAlert },
   { href: '/whois-checker', label: 'WHOIS Checker', icon: Globe },
   { href: '/registrars', label: 'Registrars', icon: Building },
-  { href: '/watchlist', label: 'Watchlist', icon: Eye },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -49,40 +56,32 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.24 }}
+            transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           />
           <motion.aside
-            initial={{ x: '-100%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '-100%', opacity: 0 }}
-            transition={{ duration: 0.28, ease: 'easeOut' }}
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             role="dialog"
             aria-modal="true"
-            className="fixed left-0 top-0 z-50 flex h-screen w-[78%] max-w-[280px] flex-col overflow-y-auto border-r border-slate-200/10 bg-white/95 p-4 dark:border-zinc-800 dark:bg-zinc-950/95 shadow-2xl"
+            className="fixed left-0 top-0 z-50 flex h-screen w-[78%] max-w-[280px] flex-col overflow-y-auto border-r border-border bg-background p-4 lg:hidden"
           >
-            <div className="flex items-center justify-between gap-4 border-b border-slate-200/10 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white font-bold dark:bg-white dark:text-slate-950">
-                  D
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">DomNotify</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Domain operations on mobile</p>
-                </div>
-              </div>
+            <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
+              <p className="text-sm font-semibold text-foreground">DomNotify</p>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-2xl p-2 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/5"
+                className="rounded-lg p-2 text-muted-foreground transition-colors duration-200 hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             <div className="mt-6 space-y-2">
-              {navItems.map((item) => (
+              {primaryItems.map((item) => (
                 <SidebarItem
                   key={item.href}
                   href={item.href}
@@ -94,7 +93,9 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               ))}
 
               <div className="mt-4">
-                <p className="px-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Utilities</p>
+                <p className="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Utilities
+                </p>
                 <div className="mt-2 space-y-2">
                   {secondaryItems.map((item) => (
                     <SidebarItem
@@ -109,9 +110,9 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                 </div>
               </div>
 
-            <div className="mt-auto">
-              <SidebarFooter onClose={onClose} />
-            </div>
+              <div className="mt-auto">
+                <SidebarFooter onClose={onClose} />
+              </div>
             </div>
           </motion.aside>
         </>

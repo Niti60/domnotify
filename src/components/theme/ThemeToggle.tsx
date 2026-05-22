@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
@@ -14,26 +13,24 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <div className="h-12" />;
+    return <div className="h-10 w-10" />;
   }
 
   const activeTheme = theme === 'system' ? resolvedTheme : theme;
   const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
 
   return (
-    <motion.button
+    <button
       type="button"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
       onClick={() => setTheme(nextTheme)}
       aria-label={`Switch to ${nextTheme} mode`}
-      className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:bg-white/10 dark:border-white/10 dark:bg-slate-950 dark:text-white dark:hover:bg-white/5"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-foreground transition-colors duration-200 hover:bg-black/5 dark:hover:bg-white/5"
     >
       {activeTheme === 'dark' ? (
-        <Sun className="h-5 w-5 text-amber-300" />
+        <Sun className="h-4 w-4" />
       ) : (
-        <Moon className="h-5 w-5 text-slate-600" />
+        <Moon className="h-4 w-4" />
       )}
-    </motion.button>
+    </button>
   );
 }

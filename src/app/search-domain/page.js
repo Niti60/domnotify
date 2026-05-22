@@ -17,7 +17,9 @@ export default function SearchDomainPage() {
 
   const results = useMemo(() => {
     if (!searched) return [];
-    return domainSearchResults.filter((item) => item.domain.includes(query.toLowerCase().replace(/\s+/g, '')));
+    return domainSearchResults.filter((item) =>
+      item.domain.includes(query.toLowerCase().replace(/\s+/g, '')),
+    );
   }, [searched, query]);
 
   const handleSearch = (value) => {
@@ -42,10 +44,10 @@ export default function SearchDomainPage() {
       />
 
       <Card className="space-y-6">
-        <div className="space-y-3">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Type a keyword or brand name to search domain availability.</p>
-          <SearchBar placeholder="example" onSearch={handleSearch} large />
-        </div>
+        <p className="text-sm text-muted-foreground">
+          Type a keyword or brand name to search domain availability.
+        </p>
+        <SearchBar placeholder="example" onSearch={handleSearch} large />
 
         <div className="grid gap-3 sm:grid-cols-3">
           {searchTlds.map((tld) => (
@@ -60,8 +62,8 @@ export default function SearchDomainPage() {
         <div className="space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Search results</p>
-              <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">{results.length} domains found</h2>
+              <p className="text-sm uppercase tracking-widest text-muted-foreground">Search results</p>
+              <h2 className="text-2xl font-semibold text-foreground">{results.length} domains found</h2>
             </div>
             <Button variant="secondary">Refine search</Button>
           </div>
@@ -72,22 +74,28 @@ export default function SearchDomainPage() {
                 <Card key={result.domain} className="space-y-4">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-lg font-semibold text-slate-900 dark:text-white">{result.domain}</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">{result.registrar}</p>
+                      <p className="text-lg font-semibold text-foreground">{result.domain}</p>
+                      <p className="text-sm text-muted-foreground">{result.registrar}</p>
                     </div>
-                    <Badge variant={result.available ? 'success' : 'neutral'}>{result.available ? 'Available' : 'Taken'}</Badge>
+                    <Badge variant={result.available ? 'success' : 'neutral'}>
+                      {result.available ? 'Available' : 'Taken'}
+                    </Badge>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <p className="text-base font-semibold text-slate-900 dark:text-white">{result.price}</p>
-                    <Button size="sm" variant={result.available ? 'primary' : 'secondary'} disabled={!result.available}>
+                    <p className="text-base font-semibold text-foreground">{result.price}</p>
+                    <Button
+                      size="sm"
+                      variant={result.available ? 'primary' : 'secondary'}
+                      disabled={!result.available}
+                    >
                       {result.available ? 'Register' : 'View alternatives'}
                     </Button>
                   </div>
                 </Card>
               ))
             ) : (
-              <Card className="rounded-3xl border-dashed border-white/10 text-center text-slate-500 dark:border-white/10 dark:text-slate-400">
-                No matching domains were found for "{query}".
+              <Card className="border-dashed text-center text-muted-foreground">
+                No matching domains were found for &quot;{query}&quot;.
               </Card>
             )}
           </div>

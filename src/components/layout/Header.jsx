@@ -3,6 +3,7 @@
 import { Menu } from 'lucide-react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { Logo } from '@/components/ui/Logo';
 
 export function Header({ onOpenMobile }) {
   return (
@@ -17,12 +18,7 @@ export function Header({ onOpenMobile }) {
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white font-semibold dark:bg-white dark:text-slate-950">
-              D
-            </div>
-            <div className="hidden sm:block">
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">DomNotify</p>
-            </div>
+            <Logo priority className="" />
           </div>
         </div>
 

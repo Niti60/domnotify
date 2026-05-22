@@ -1,22 +1,12 @@
-import { motion } from 'framer-motion';
-
 export function EmptyState({ icon: Icon, title, description, action }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center py-24 px-4"
-    >
-      <div className="rounded-full bg-white/5 dark:bg-slate-950 p-6 mb-6">
-        <Icon className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+    <div className="flex flex-col items-center justify-center px-4 py-24">
+      <div className="mb-6 rounded-full bg-muted p-6">
+        <Icon className="h-8 w-8 text-muted-foreground" />
       </div>
-      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-        {title}
-      </h3>
-      <p className="text-sm text-slate-600 dark:text-slate-400 text-center max-w-sm mb-6">
-        {description}
-      </p>
+      <h3 className="mb-2 text-lg font-semibold text-foreground">{title}</h3>
+      <p className="mb-6 max-w-sm text-center text-sm text-muted-foreground">{description}</p>
       {action && <div>{action}</div>}
-    </motion.div>
+    </div>
   );
 }

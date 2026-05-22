@@ -1,17 +1,15 @@
 export function Skeleton({ className = '' }) {
   return (
-    <div
-      className={`animate-pulse bg-slate-200 dark:bg-zinc-800 rounded-lg ${className}`}
-    />
+    <div className={`animate-pulse rounded-lg bg-muted ${className}`} />
   );
 }
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-xl border border-white/10 p-6 bg-(--surface) dark:bg-slate-950/95">
-      <Skeleton className="h-4 w-1/3 mb-4" />
-      <Skeleton className="h-8 w-1/2 mb-4" />
-      <Skeleton className="h-4 w-full mb-2" />
+    <div className="rounded-xl border border-border bg-card p-6">
+      <Skeleton className="mb-4 h-4 w-1/3" />
+      <Skeleton className="mb-4 h-8 w-1/2" />
+      <Skeleton className="mb-2 h-4 w-full" />
       <Skeleton className="h-4 w-5/6" />
     </div>
   );

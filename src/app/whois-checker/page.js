@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Globe, Copy, Check } from 'lucide-react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Card } from '@/components/ui/Card';
@@ -41,9 +40,9 @@ export default function WhoisCheckerPage() {
       />
 
       <Card className="space-y-6">
-        <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Enter a domain name to review current WHOIS records.</p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          Enter a domain name to review current WHOIS records.
+        </p>
         <form onSubmit={handleCheck} className="grid gap-4 sm:grid-cols-[1fr_auto]">
           <Input
             label="Domain"
@@ -61,41 +60,40 @@ export default function WhoisCheckerPage() {
         <div className="space-y-6">
           <Card className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Domain</p>
-                <p className="mt-1 font-semibold text-slate-900 dark:text-white">{whoisData.domain}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Registrar</p>
-                <p className="mt-1 font-semibold text-slate-900 dark:text-white">{whoisData.registrar}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Registered</p>
-                <p className="mt-1 font-semibold text-slate-900 dark:text-white">{whoisData.created}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Expires</p>
-                <p className="mt-1 font-semibold text-slate-900 dark:text-white">{whoisData.expires}</p>
-              </div>
+              {[
+                ['Domain', whoisData.domain],
+                ['Registrar', whoisData.registrar],
+                ['Registered', whoisData.created],
+                ['Expires', whoisData.expires],
+              ].map(([label, value]) => (
+                <div key={label}>
+                  <p className="text-sm text-muted-foreground">{label}</p>
+                  <p className="mt-1 font-semibold text-foreground">{value}</p>
+                </div>
+              ))}
             </div>
           </Card>
 
           <Card className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Registrant</p>
-                <p className="mt-1 font-semibold text-slate-900 dark:text-white">{whoisData.registrant}</p>
+                <p className="text-sm text-muted-foreground">Registrant</p>
+                <p className="mt-1 font-semibold text-foreground">{whoisData.registrant}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Email</p>
+                <p className="text-sm text-muted-foreground">Email</p>
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="font-semibold text-slate-900 dark:text-white">{whoisData.email}</span>
+                  <span className="font-semibold text-foreground">{whoisData.email}</span>
                   <button
                     type="button"
                     onClick={() => copyText(whoisData.email)}
-                    className="rounded-xl bg-white/5 p-2 text-slate-600 transition hover:bg-white/10 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-white/10"
+                    className="rounded-lg border border-border p-2 text-muted-foreground transition-colors duration-200 hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
                   >
-                    {copied === whoisData.email ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+                    {copied === whoisData.email ? (
+                      <Check className="h-4 w-4 text-emerald-600" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -105,17 +103,24 @@ export default function WhoisCheckerPage() {
           <Card>
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Nameservers</p>
+                <p className="text-sm text-muted-foreground">Nameservers</p>
                 <div className="mt-3 space-y-2">
                   {whoisData.nameservers.map((ns) => (
-                    <div key={ns} className="flex items-center justify-between rounded-3xl border border-white/10 bg-(--surface) px-4 py-3 dark:border-white/10 dark:bg-slate-950/95">
-                      <span className="font-mono text-sm text-slate-900 dark:text-white">{ns}</span>
+                    <div
+                      key={ns}
+                      className="flex items-center justify-between rounded-lg border border-border bg-muted px-4 py-3"
+                    >
+                      <span className="font-mono text-sm text-foreground">{ns}</span>
                       <button
                         type="button"
                         onClick={() => copyText(ns)}
-                        className="rounded-xl bg-white/5 p-2 text-slate-600 transition hover:bg-white/10 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-white/10"
+                        className="rounded-lg border border-border p-2 text-muted-foreground transition-colors duration-200 hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
                       >
-                        {copied === ns ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+                        {copied === ns ? (
+                          <Check className="h-4 w-4 text-emerald-600" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   ))}
@@ -124,12 +129,16 @@ export default function WhoisCheckerPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Status</p>
-                  <Badge variant="success">{whoisData.status}</Badge>
+                  <p className="text-sm text-muted-foreground">Status</p>
+                  <Badge variant="success" className="mt-2">
+                    {whoisData.status}
+                  </Badge>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">DNSSEC</p>
-                  <Badge variant="neutral">{whoisData.dnssec}</Badge>
+                  <p className="text-sm text-muted-foreground">DNSSEC</p>
+                  <Badge variant="neutral" className="mt-2">
+                    {whoisData.dnssec}
+                  </Badge>
                 </div>
               </div>
             </div>

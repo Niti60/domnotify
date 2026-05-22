@@ -16,42 +16,59 @@ export default function SSLMonitorPage() {
 
       <div className="grid gap-6 sm:grid-cols-3">
         <Card className="text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Active certificates</p>
-          <p className="mt-3 text-4xl font-semibold text-slate-900 dark:text-white">4</p>
+          <p className="text-sm text-muted-foreground">Active certificates</p>
+          <p className="mt-3 text-4xl font-semibold text-foreground">4</p>
         </Card>
         <Card className="text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Expiring soon</p>
+          <p className="text-sm text-muted-foreground">Expiring soon</p>
           <p className="mt-3 text-4xl font-semibold text-amber-600 dark:text-amber-400">1</p>
         </Card>
         <Card className="text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Expired certificates</p>
-          <p className="mt-3 text-4xl font-semibold text-rose-600 dark:text-rose-400">1</p>
+          <p className="text-sm text-muted-foreground">Expired certificates</p>
+          <p className="mt-3 text-4xl font-semibold text-red-600 dark:text-red-400">1</p>
         </Card>
       </div>
 
       <Card>
-        <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Certificate status</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Track the health of each SSL certificate on your domains.</p>
+            <h2 className="text-lg font-semibold text-foreground">Certificate status</h2>
+            <p className="text-sm text-muted-foreground">
+              Track the health of each SSL certificate on your domains.
+            </p>
           </div>
-          <Button size="sm" variant="secondary">Configure alerts</Button>
+          <Button size="sm" variant="secondary">
+            Configure alerts
+          </Button>
         </div>
 
-        <div className="space-y-0 divide-y divide-zinc-200 rounded-[28px] border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="divide-y divide-border rounded-lg border border-border">
           {sslCertificates.map((cert) => (
-            <div key={cert.domain} className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              key={cert.domain}
+              className="flex flex-col gap-4 px-4 py-4 transition-colors duration-200 hover:bg-black/5 dark:hover:bg-white/5 sm:flex-row sm:items-center sm:justify-between"
+            >
               <div>
-                <p className="font-semibold text-slate-900 dark:text-white">{cert.domain}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{cert.issuer} · Expires {cert.expires}</p>
+                <p className="font-semibold text-foreground">{cert.domain}</p>
+                <p className="text-sm text-muted-foreground">
+                  {cert.issuer} · Expires {cert.expires}
+                </p>
               </div>
               <div className="flex flex-wrap items-center gap-4">
-                <StatusBadge variant={cert.status === 'Valid' || cert.status === 'valid' ? 'success' : cert.status === 'Renew soon' || cert.status === 'warning' ? 'warning' : 'danger'}>
+                <StatusBadge
+                  variant={
+                    cert.status === 'Valid' || cert.status === 'valid'
+                      ? 'success'
+                      : cert.status === 'Renew soon' || cert.status === 'warning'
+                        ? 'warning'
+                        : 'danger'
+                  }
+                >
                   {cert.status}
                 </StatusBadge>
                 <button
                   type="button"
-                  className="text-sm text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white underline-offset-2 hover:underline"
+                  className="text-sm text-muted-foreground underline-offset-2 transition-colors duration-200 hover:text-foreground hover:underline"
                 >
                   View details
                 </button>
@@ -62,9 +79,11 @@ export default function SSLMonitorPage() {
       </Card>
 
       <Card>
-        <div className="rounded-3xl border border-zinc-200 bg-slate-50 p-5 text-sm text-slate-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-slate-200">
-          <p className="font-semibold">Pro tip:</p>
-          <p className="mt-2">Enable SSL auto-renewal to reduce manual maintenance and prevent service interruptions.</p>
+        <div className="rounded-lg border border-border bg-muted p-5 text-sm text-foreground">
+          <p className="font-semibold">Pro tip</p>
+          <p className="mt-2 text-muted-foreground">
+            Enable SSL auto-renewal to reduce manual maintenance and prevent service interruptions.
+          </p>
         </div>
       </Card>
     </div>

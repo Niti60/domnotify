@@ -13,9 +13,9 @@ export default function RootLayout({ children }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.svg" />
+        <link rel="icon" href="/FavIcon.svg" />
       </head>
-      <body className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-300">
+      <body className="min-h-screen bg-background text-foreground antialiased">
         <Providers>
           <LayoutWrapper>{children}</LayoutWrapper>
         </Providers>

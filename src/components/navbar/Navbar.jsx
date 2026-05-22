@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { Logo } from '@/components/ui/Logo';
+import { cn } from '@/lib/cn';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -23,46 +24,36 @@ export function Navbar({ onMenuClick }) {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-(--background)/80 backdrop-blur-xl transition-all duration-200">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background transition-colors duration-200">
       <div className="mx-auto flex h-16 max-w-full items-center justify-between gap-8 px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
         <div className="flex shrink-0 items-center gap-3">
           <button
             type="button"
             onClick={onMenuClick}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-slate-700 transition-all hover:bg-white/5 dark:text-slate-300 dark:hover:bg-white/5 md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-foreground transition-colors duration-200 hover:bg-black/5 dark:hover:bg-white/5 lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-white font-semibold text-sm dark:bg-white dark:text-slate-950">
-              D
-            </div>
-            <div className="hidden sm:block">
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">DomNotify</p>
-            </div>
-          </div>
+          <Logo priority className="" />
         </div>
 
-        {/* Primary Navigation - Desktop Only */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <motion.div
-                whileHover={{ y: -2 }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  isActive(item.href)
-                    ? 'text-slate-900 dark:text-white'
-                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                }`}
-              >
-                {item.label}
-              </motion.div>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200',
+                isActive(item.href)
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {item.label}
             </Link>
           ))}
         </nav>
 
-        {/* Right side - Search & Theme */}
         <div className="ml-auto flex items-center gap-3">
           <div className="hidden lg:block">
             <SearchBar placeholder="Search..." />

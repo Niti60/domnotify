@@ -3,7 +3,6 @@
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { registrarCards } from '@/data/dummyData';
 
 export default function RegistrarsPage() {
@@ -19,16 +18,20 @@ export default function RegistrarsPage() {
           <Card key={registrar.name} className="space-y-5">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">{registrar.popularity}</p>
-                <h2 className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">{registrar.name}</h2>
+                <p className="text-sm uppercase tracking-widest text-muted-foreground">
+                  {registrar.popularity}
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-foreground">{registrar.name}</h2>
               </div>
-              <div className="rounded-3xl bg-white/5 px-4 py-2 text-sm font-semibold text-slate-900 dark:bg-white/10 dark:text-white">{registrar.price}</div>
+              <div className="rounded-lg border border-border bg-muted px-4 py-2 text-sm font-semibold text-foreground">
+                {registrar.price}
+              </div>
             </div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">{registrar.bestFor}</p>
-            <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+            <p className="text-sm text-muted-foreground">{registrar.bestFor}</p>
+            <div className="space-y-3 text-sm text-muted-foreground">
               {registrar.features.map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-white" />
+                  <span className="h-2 w-2 rounded-full bg-foreground" />
                   <span>{item}</span>
                 </div>
               ))}
@@ -40,19 +43,22 @@ export default function RegistrarsPage() {
 
       <Card>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm text-slate-600 dark:text-slate-300">
-            <thead className="border-b border-white/10 dark:border-white/10 text-slate-900 dark:text-white">
+          <table className="min-w-full text-sm text-muted-foreground">
+            <thead className="border-b border-border text-foreground">
               <tr>
-                <th className="px-4 py-4 text-left">Registrar</th>
-                <th className="px-4 py-4 text-left">Price</th>
-                <th className="px-4 py-4 text-left">Privacy</th>
-                <th className="px-4 py-4 text-left">Support</th>
+                <th className="px-4 py-4 text-left font-semibold">Registrar</th>
+                <th className="px-4 py-4 text-left font-semibold">Price</th>
+                <th className="px-4 py-4 text-left font-semibold">Privacy</th>
+                <th className="px-4 py-4 text-left font-semibold">Support</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            <tbody className="divide-y divide-border">
               {registrarCards.map((registrar) => (
-                <tr key={registrar.name} className="hover:bg-white/5 dark:hover:bg-white/10 transition">
-                  <td className="px-4 py-4 font-semibold text-slate-900 dark:text-white">{registrar.name}</td>
+                <tr
+                  key={registrar.name}
+                  className="transition-colors duration-200 hover:bg-black/5 dark:hover:bg-white/5"
+                >
+                  <td className="px-4 py-4 font-semibold text-foreground">{registrar.name}</td>
                   <td className="px-4 py-4">{registrar.price}</td>
                   <td className="px-4 py-4">Included</td>
                   <td className="px-4 py-4">Email support</td>

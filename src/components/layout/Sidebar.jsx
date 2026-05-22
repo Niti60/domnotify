@@ -44,18 +44,16 @@ export function Sidebar({ collapsed, onToggle }) {
             <Link key={item.href} href={item.href} className="group">
               <motion.div
                 whileHover={{ x: 4 }}
-                className={`flex items-center gap-3 rounded-3xl px-3 py-3 text-sm font-medium transition-all duration-200 ${
-                  active
+                className={`flex items-center gap-3 rounded-3xl px-3 py-3 text-sm font-medium transition-all duration-200 ${active
                     ? 'bg-white/10 text-slate-900 shadow-sm dark:bg-white/10 dark:border dark:border-white/10 dark:text-white'
                     : 'text-slate-700 hover:bg-white/5 dark:text-slate-400 dark:hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <span
-                  className={`flex h-11 w-11 items-center justify-center rounded-2xl transition-colors duration-200 ${
-                    active
+                  className={`flex h-11 w-11 items-center justify-center rounded-2xl transition-colors duration-200 ${active
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950'
                       : 'bg-white/10 text-slate-700 dark:bg-white/10 dark:text-white/70'
-                  }`}
+                    }`}
                 >
                   <Icon className="h-5 w-5" />
                 </span>

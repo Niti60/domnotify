@@ -20,11 +20,12 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop Sidebar - Fixed, no collapse */}
-      <aside className="fixed left-0 top-16 z-30 hidden h-[calc(100vh-64px)] w-72 flex-col overflow-y-auto border-r border-zinc-200 bg-white/95 transition-all duration-200 dark:bg-zinc-950 dark:border-zinc-800 lg:flex">
+      <aside className="fixed left-0 top-16 z-30 hidden h-[calc(100vh-4rem)] w-72 flex-col overflow-y-auto border-r border-border bg-background transition-colors duration-200 lg:flex">
         <nav className="space-y-1 px-4 py-6">
           <div className="mb-6">
-            <p className="px-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Utilities</p>
+            <p className="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Utilities
+            </p>
           </div>
           {secondaryItems.map((item) => (
             <SidebarItem
@@ -37,9 +38,7 @@ export function Sidebar() {
           ))}
         </nav>
       </aside>
-
-      {/* Spacer for desktop layout */}
-      <div className="hidden lg:block w-72" />
+      <div className="hidden w-72 lg:block" />
     </>
   );
 }

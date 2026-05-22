@@ -26,32 +26,32 @@ export default function ToolsPage() {
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {tools.map((tool) => (
           <Card key={tool.name} className="space-y-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-white/5 text-slate-900 dark:bg-white/10 dark:text-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted text-foreground">
               <tool.icon className="h-6 w-6" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{tool.name}</h3>
-              <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">{tool.description}</p>
+              <h3 className="text-lg font-semibold text-foreground">{tool.name}</h3>
+              <p className="text-sm leading-6 text-muted-foreground">{tool.description}</p>
             </div>
-            <Button size="sm" variant="primary">Open</Button>
+            <Button size="sm" variant="primary">
+              Open
+            </Button>
           </Card>
         ))}
       </div>
 
       <Card>
         <div className="grid gap-6 md:grid-cols-3">
-          <div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Quick access</p>
-            <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">Start with the domain search or SSL check.</p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Automations</p>
-            <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">Configure alerts for expiring domains.</p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Visibility</p>
-            <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">Keep your domain portfolio secure and renewal-ready.</p>
-          </div>
+          {[
+            ['Quick access', 'Start with the domain search or SSL check.'],
+            ['Automations', 'Configure alerts for expiring domains.'],
+            ['Visibility', 'Keep your domain portfolio secure and renewal-ready.'],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <p className="text-sm text-muted-foreground">{label}</p>
+              <p className="mt-2 text-xl font-semibold text-foreground">{value}</p>
+            </div>
+          ))}
         </div>
       </Card>
     </div>

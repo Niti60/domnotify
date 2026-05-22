@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/cn';
 
 export function SearchBar({ onSearch, placeholder = 'Search...', large = false }) {
   const [value, setValue] = useState('');
@@ -14,29 +15,33 @@ export function SearchBar({ onSearch, placeholder = 'Search...', large = false }
     }
   };
 
+  const fieldClasses = cn(
+    'flex items-center gap-3 rounded-lg border bg-background px-4 transition-colors duration-200',
+    large ? 'py-3' : 'py-2',
+    isFocused ? 'border-blue-600 ring-1 ring-blue-600/20' : 'border-border',
+  );
+
   if (large) {
     return (
       <form onSubmit={handleSearch} className="relative">
-        <div className="relative rounded-3xl border border-slate-200 bg-(--surface) px-4 py-3 shadow-sm transition-all duration-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 dark:border-white/10 dark:bg-slate-950 dark:focus-within:ring-blue-900/40">
-          <div className="flex items-center gap-3">
-            <Search className="h-5 w-5 text-slate-400" />
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              placeholder={placeholder}
-              className="w-full bg-transparent text-base text-slate-900 placeholder-slate-400 outline-none dark:text-white"
-            />
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 rounded-2xl bg-slate-900/95 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-            >
-              Search
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
+        <div className={fieldClasses}>
+          <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder={placeholder}
+            className="w-full bg-transparent text-base text-foreground placeholder:text-muted-foreground outline-none"
+          />
+          <button
+            type="submit"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-500"
+          >
+            Search
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       </form>
     );
@@ -44,8 +49,8 @@ export function SearchBar({ onSearch, placeholder = 'Search...', large = false }
 
   return (
     <form onSubmit={handleSearch} className="w-full">
-      <div className={`flex items-center gap-3 rounded-3xl border px-4 py-3 transition-all duration-200 ${isFocused ? 'border-blue-500 ring-1 ring-blue-200 dark:ring-blue-900/50' : 'border-slate-200 dark:border-white/10'} bg-(--surface) dark:bg-slate-950`}>
-        <Search className="h-4 w-4 text-slate-400" />
+      <div className={fieldClasses}>
+        <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
         <input
           type="text"
           value={value}
@@ -53,7 +58,7 @@ export function SearchBar({ onSearch, placeholder = 'Search...', large = false }
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className="w-full bg-transparent text-sm text-slate-900 placeholder-slate-400 outline-none dark:text-white"
+          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
         />
       </div>
     </form>

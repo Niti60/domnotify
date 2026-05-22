@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { cn } from '@/lib/cn';
 
 export function Button({
   children,
@@ -10,13 +10,16 @@ export function Button({
   className = '',
   ...props
 }) {
-  const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed';
-  
+  const baseClasses =
+    'inline-flex items-center justify-center rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+
   const variants = {
-    primary: 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-zinc-200 transition-all duration-200',
-    secondary: 'bg-white/5 dark:bg-white/10 text-slate-900 dark:text-white hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-200',
-    ghost: 'text-slate-700 dark:text-slate-300 hover:bg-white/5 dark:hover:bg-white/10 transition-all duration-200',
-    outline: 'border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-200',
+    primary: 'bg-blue-600 text-white hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500',
+    secondary:
+      'border border-border bg-muted text-foreground hover:bg-black/5 dark:hover:bg-white/5',
+    ghost: 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5',
+    outline:
+      'border border-border text-foreground hover:bg-black/5 dark:hover:bg-white/5',
   };
 
   const sizes = {
@@ -26,15 +29,13 @@ export function Button({
   };
 
   return (
-    <motion.button
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
+    <button
       disabled={disabled}
       onClick={onClick}
-      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${fullWidth ? 'w-full' : ''} ${className}`}
+      className={cn(baseClasses, variants[variant], sizes[size], fullWidth && 'w-full', className)}
       {...props}
     >
       {children}
-    </motion.button>
+    </button>
   );
 }

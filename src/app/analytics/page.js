@@ -39,13 +39,15 @@ export default function AnalyticsPage() {
           return (
             <DashboardCard key={card.title}>
               <div className="flex items-center gap-4">
-                <div className="rounded-3xl bg-white/5 p-4 text-slate-700 dark:bg-white/10 dark:text-slate-200">
+                <div className="rounded-lg bg-muted p-4 text-foreground">
                   <Icon className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">{card.title}</p>
-                  <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{card.value}</p>
-                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{card.description}</p>
+                  <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+                    {card.title}
+                  </p>
+                  <p className="mt-2 text-3xl font-semibold text-foreground">{card.value}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{card.description}</p>
                 </div>
               </div>
             </DashboardCard>
