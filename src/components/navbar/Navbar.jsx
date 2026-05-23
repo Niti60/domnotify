@@ -1,12 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Logo } from '@/components/ui/Logo';
 import { cn } from '@/lib/cn';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -59,8 +62,53 @@ export function Navbar({ onMenuClick }) {
             <SearchBar placeholder="Search..." />
           </div>
           <ThemeToggle />
+          <AuthStatus />
         </div>
       </div>
     </header>
+  );
+}
+
+function AuthStatus() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  if (loading) {
+    return null;
+  }
+
+  if (!user) {
+    return (
+      <button
+        onClick={() => router.push('/auth')}
+        className="ml-2 rounded-md px-3 py-1.5 text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors duration-200"
+        aria-label="Sign in"
+      >
+        Login
+      </button>
+    );
+  }
+
+  const initial = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+
+  return (
+    <button
+      onClick={() => router.push('/me')}
+      className="ml-2 inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground text-sm font-medium hover:opacity-90 transition-opacity duration-150 overflow-hidden"
+      aria-label="Account"
+    >
+      {user.profilePic ? (
+        <Image
+          src={user.profilePic}
+          alt={user.name || 'avatar'}
+          width={36}
+          height={36}
+          className="h-full w-full object-cover"
+          style={{ height: 'auto' }}
+        />
+      ) : (
+        <span className="h-full w-full inline-flex items-center justify-center rounded-full bg-blue-600 text-white">{initial}</span>
+      )}
+    </button>
   );
 }

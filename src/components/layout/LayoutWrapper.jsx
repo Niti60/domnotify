@@ -1,12 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/sidebar/Sidebar';
 import { Navbar } from '@/components/navbar/Navbar';
 import { MobileSidebar } from '@/components/layout/MobileSidebar';
 
 export function LayoutWrapper({ children }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const pathname = usePathname();
+  const isAuthPage = pathname?.startsWith('/auth');
+
+  if (isAuthPage) {
+    return <div className="min-h-screen bg-background text-foreground">{children}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

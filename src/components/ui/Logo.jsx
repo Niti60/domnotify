@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
+import { useTheme } from '../theme/ThemeProvider';
 import { useEffect, useState } from 'react';
 
 export function Logo({ className = '', priority = false }) {
@@ -24,10 +24,24 @@ export function Logo({ className = '', priority = false }) {
   return (
     <div className={`flex items-center ${className}`}>
       <div className="block md:hidden">
-        <Image src={iconSrc} alt="DomNotify" width={32} height={32} priority={priority} />
+        <Image
+          src={iconSrc}
+          alt="DomNotify"
+          width={32}
+          height={32}
+          priority={priority}
+          style={{ height: 'auto' }}
+        />
       </div>
       <div className="hidden items-center md:flex">
-        <Image src={fullSrc} alt="DomNotify" width={160} height={36} priority={priority} />
+        <Image
+          src={fullSrc}
+          alt="DomNotify"
+          width={160}
+          height={36}
+          priority={priority}
+          style={{ height: 'auto' }}
+        />
       </div>
     </div>
   );

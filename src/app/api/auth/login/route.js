@@ -1,0 +1,94 @@
+import { connectDB } from "@/lib/db";
+import User from "@/models/User";
+import bcrypt from "bcryptjs";
+import { generateToken } from "@/lib/jwt";
+import { NextResponse } from "next/server";
+
+export async function POST(req) {
+  try {
+    await connectDB();
+
+    const body = await req.json();
+
+    const email = body.email?.toLowerCase().trim();
+    const password = body.password;
+
+    if (!email || !password) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Email and password required",
+        },
+        { status: 400 }
+      );
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid credentials",
+        },
+        { status: 401 }
+      );
+    }
+
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!isMatch) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid credentials",
+        },
+        { status: 401 }
+      );
+    }
+
+    const token = generateToken(user);
+
+    const response = NextResponse.json(
+      {
+        success: true,
+        message: "Login successful",
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          companyName: user.companyName,
+          profilePic: user.profilePic,
+        },
+      },
+      { status: 200 }
+    );
+
+    response.cookies.set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Login Error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Internal server error",
+      },
+      { status: 500 }
+    );
+  }
+}
