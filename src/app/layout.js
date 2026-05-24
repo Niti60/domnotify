@@ -1,3 +1,4 @@
+import { Toaster } from 'sonner';
 import { Providers } from '@/components/theme/ThemeProvider';
 import { LayoutWrapper } from '@/components/layout/LayoutWrapper';
 import { AuthProvider } from '@/context/AuthContext';
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
         <Providers>
           <AuthProvider>
             <LayoutWrapper>{children}</LayoutWrapper>
+            <Toaster position="top-right" richColors />
           </AuthProvider>
         </Providers>
       </body>

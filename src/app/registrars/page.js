@@ -36,7 +36,12 @@ export default function RegistrarsPage() {
                 </div>
               ))}
             </div>
-            <Button fullWidth>View plan</Button>
+            <Button
+              fullWidth
+              onClick={() => window.open(registrar.url, '_blank', 'noopener,noreferrer')}
+            >
+              View plan
+            </Button>
           </Card>
         ))}
       </div>
@@ -61,7 +66,7 @@ export default function RegistrarsPage() {
                   <td className="px-4 py-4 font-semibold text-foreground">{registrar.name}</td>
                   <td className="px-4 py-4">{registrar.price}</td>
                   <td className="px-4 py-4">Included</td>
-                  <td className="px-4 py-4">Email support</td>
+                  <td className="px-4 py-4">{registrar.supportEmail}</td>
                 </tr>
               ))}
             </tbody>

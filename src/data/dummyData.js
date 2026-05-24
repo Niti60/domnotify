@@ -8,14 +8,14 @@ export const dashboardStats = [
 export const expiringDomains = [
   { domain: 'workspace.io', expiry: '2025-06-14', daysLeft: 9, registrar: 'Namecheap' },
   { domain: 'brandhub.co', expiry: '2025-06-28', daysLeft: 23, registrar: 'Cloudflare' },
-  { domain: 'launchpad.dev', expiry: '2025-07-03', daysLeft: 28, registrar: 'Google Domains' },
+  { domain: 'launchpad.dev', expiry: '2025-07-03', daysLeft: 28, registrar: 'Squarespace Domains' },
   { domain: 'secureapp.com', expiry: '2025-07-14', daysLeft: 39, registrar: 'GoDaddy' },
 ];
 
 export const monitoringDomains = [
   { domain: 'workspace.io', registrar: 'Namecheap', expires: '2025-06-14', renewal: '$12.99', status: 'Available', lastChecked: '2 hours ago' },
   { domain: 'brandhub.co', registrar: 'Cloudflare', expires: '2025-06-28', renewal: '$14.50', status: 'Review', lastChecked: '6 hours ago' },
-  { domain: 'launchpad.dev', registrar: 'Google Domains', expires: '2025-07-03', renewal: '$19.00', status: 'Available', lastChecked: '1 day ago' },
+  { domain: 'launchpad.dev', registrar: 'Squarespace Domains', expires: '2025-07-03', renewal: '$19.00', status: 'Available', lastChecked: '1 day ago' },
   { domain: 'secureapp.com', registrar: 'GoDaddy', expires: '2025-07-14', renewal: '$18.99', status: 'Pending', lastChecked: '4 hours ago' },
 ];
 
@@ -40,7 +40,7 @@ export const whoisData = {
 export const watchlistDomains = [
   { domain: 'futurestack.ai', registrar: 'Namecheap', expiry: '2025-11-12', status: 'Available', score: 91, price: '$2,900' },
   { domain: 'growthlabs.dev', registrar: 'Cloudflare', expiry: '2025-06-14', status: 'Expiring soon', score: 84, price: '$1,650' },
-  { domain: 'launchcode.app', registrar: 'Google Domains', expiry: '2025-07-03', status: 'Available', score: 78, price: '$740' },
+  { domain: 'launchcode.app', registrar: 'Squarespace Domains', expiry: '2025-07-03', status: 'Available', score: 78, price: '$740' },
   { domain: 'cloudpilot.io', registrar: 'Namecheap', expiry: '2025-06-18', status: 'Expiring soon', score: 70, price: '$1,100' },
   { domain: 'motiongrid.co', registrar: 'GoDaddy', expiry: '2025-05-10', status: 'Expired', score: 65, price: '$1,250' },
   { domain: 'stackverse.ai', registrar: 'Cloudflare', expiry: '2025-06-20', status: 'Expiring soon', score: 80, price: '$1,400' },
@@ -77,20 +77,26 @@ export const registrarCards = [
     bestFor: 'Portfolio management',
     features: ['WHOIS privacy included', 'DNS management', 'Renewal alerts'],
     popularity: 'Best value',
+    url: 'https://www.namecheap.com/',
+    supportEmail: 'support@namecheap.com',
   },
   {
-    name: 'Cloudflare',
+    name: 'Cloudflare Registrar',
     price: '$12.99/yr',
     bestFor: 'Low renewal costs',
     features: ['Free DNS', 'Fast propagation', 'Privacy protection'],
     popularity: 'Budget-friendly',
+    url: 'https://www.cloudflare.com/products/registrar/',
+    supportEmail: 'registrar-abuse@cloudflare.com',
   },
   {
-    name: 'Google Domains',
+    name: 'Squarespace Domains',
     price: '$15.00/yr',
     bestFor: 'Simple pricing',
-    features: ['Clean UI', 'Privacy protection', 'Google integrations'],
+    features: ['Clean UI', 'Privacy protection', 'Squarespace ecosystem'],
     popularity: 'Trusted option',
+    url: 'https://domains.squarespace.com/',
+    supportEmail: 'support@squarespace.com',
   },
 ];
 
@@ -98,7 +104,7 @@ export const domainSearchResults = [
   { domain: 'startupflow.com', available: true, price: '$9.99/yr', registrar: 'Namecheap' },
   { domain: 'appstream.io', available: true, price: '$29.99/yr', registrar: 'Cloudflare' },
   { domain: 'launchpad.dev', available: false, price: 'Taken', registrar: 'Owned' },
-  { domain: 'brandtrack.ai', available: true, price: '$34.99/yr', registrar: 'Google Domains' },
+  { domain: 'brandtrack.ai', available: true, price: '$34.99/yr', registrar: 'Squarespace Domains' },
 ];
 
 export const recentActivity = [
