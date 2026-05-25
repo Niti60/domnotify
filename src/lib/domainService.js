@@ -37,20 +37,47 @@ export async function checkDomainSSL(domain) {
     const whoisCertData = await getSSLCertificate(domain.domainName).catch(() => null);
     const whoisCert = whoisCertData?.certificate || whoisCertData || null;
 
+    function toSafeString(val, fallback = null) {
+      if (val === undefined || val === null) return fallback;
+      if (typeof val === 'string') return val;
+      if (typeof val === 'number' || typeof val === 'bigint') return String(val);
+      if (typeof val === 'object') {
+        // prefer common issuer fields
+        return val.O || val.organization || val.CN || val.commonName || JSON.stringify(val);
+      }
+      return String(val);
+    }
+
     if (localCert) {
-      domain.sslIssuer = localCert.issuer;
+      domain.sslIssuer = toSafeString(localCert.issuer, domain.sslIssuer);
       domain.sslValidFrom = localCert.validFrom ? new Date(localCert.validFrom) : domain.sslValidFrom;
       domain.sslValidTo = localCert.validTo ? new Date(localCert.validTo) : domain.sslValidTo;
-      domain.sslSerialNumber = localCert.serialNumber || domain.sslSerialNumber;
+      domain.sslSerialNumber = toSafeString(localCert.serialNumber, domain.sslSerialNumber);
     }
 
     if (whoisCert) {
-      domain.sslIssuer = whoisCert.issuer || domain.sslIssuer;
-      domain.sslValidFrom = whoisCert.valid_from ? new Date(whoisCert.valid_from) : domain.sslValidFrom;
-      domain.sslValidTo = whoisCert.valid_to ? new Date(whoisCert.valid_to) : domain.sslValidTo;
-      domain.sslSerialNumber = whoisCert.serial_number || domain.sslSerialNumber;
-      domain.sslEncryption = whoisCert.encryption || whoisCert.encryption_algorithm;
-      domain.sslChainStatus = whoisCert.chain_status === true || whoisCert.chain_status === 'valid' ? 'Valid' : 'Incomplete/Unknown';
+      domain.sslIssuer = toSafeString(whoisCert.issuer || whoisCert.issued_by, domain.sslIssuer);
+
+      const whoisValidFrom = whoisCert.valid_from || whoisCert.validFrom || whoisCert.valid_from_date || whoisCert.valid_from_at || whoisCert.not_before || whoisCert.from;
+      const whoisValidTo = whoisCert.valid_to || whoisCert.validTo || whoisCert.valid_to_date || whoisCert.valid_to_at || whoisCert.not_after || whoisCert.expires || whoisCert.to;
+
+      if (whoisValidFrom) {
+        try {
+          domain.sslValidFrom = new Date(whoisValidFrom);
+        } catch (_) {}
+      }
+
+      if (whoisValidTo) {
+        try {
+          domain.sslValidTo = new Date(whoisValidTo);
+        } catch (_) {}
+      }
+
+      domain.sslSerialNumber = toSafeString(whoisCert.serial_number || whoisCert.serialNumber || whoisCert.serial, domain.sslSerialNumber);
+      domain.sslEncryption = toSafeString(whoisCert.encryption || whoisCert.encryption_algorithm || whoisCert.cipher, domain.sslEncryption);
+
+      const chain = whoisCert.chain_status || whoisCert.chainStatus || whoisCert.chain;
+      domain.sslChainStatus = chain === true || String(chain).toLowerCase() === 'valid' ? 'Valid' : (chain === false || String(chain).toLowerCase() === 'invalid' ? 'Incomplete/Unknown' : domain.sslChainStatus || 'Incomplete/Unknown');
     }
 
     domain.sslStatus = computeSslStatus(domain.sslValidTo);

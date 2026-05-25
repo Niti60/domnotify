@@ -1,52 +1,55 @@
-const API_KEY = process.env.WHO_IS_JSON_API_KEY;
-const BASE_URL = 'https://whoisjson.com/api/v1';
+import { whoisFetch } from './whoisClient';
 
-async function fetchWhoisJSON(endpoint, params = {}) {
+export async function getWhoisData(domain) {
     try {
-        const url = new URL(`${BASE_URL}${endpoint}`);
-        Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
-
-        const response = await fetch(url.toString(), {
-            method: 'GET',
-            headers: {
-                Authorization: `Token ${API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `WHOISJSON API error: ${response.status}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error(`Error fetching from WHOISJSON (${endpoint}):`, error.message);
-        throw error;
+        return await whoisFetch('/whois', { domain });
+    } catch (err) {
+        console.error(`[WHOISJSON] WHOIS lookup failed for ${domain}`);
+        throw err;
     }
 }
 
-export async function getWhoisData(domain) {
-    return fetchWhoisJSON('/whois', { domain });
-}
-
 export async function getDomainAvailability(domain) {
-    return fetchWhoisJSON('/domain-availability', { domain });
+    try {
+        return await whoisFetch('/domain-availability', { domain });
+    } catch (err) {
+        console.error(`[WHOISJSON] Domain availability check failed for ${domain}`);
+        throw err;
+    }
 }
 
 export async function getDNSRecords(domain) {
-    return fetchWhoisJSON('/nslookup', { domain });
+    try {
+        return await whoisFetch('/nslookup', { domain });
+    } catch (err) {
+        console.error(`[WHOISJSON] DNS lookup failed for ${domain}`);
+        throw err;
+    }
 }
 
 export async function getSSLCertificate(domain) {
-    return fetchWhoisJSON('/ssl-cert-check', { domain });
+    try {
+        return await whoisFetch('/ssl-cert-check', { domain });
+    } catch (err) {
+        console.error(`[WHOISJSON] SSL lookup failed for ${domain}`);
+        throw err;
+    }
 }
 
 export async function getSubdomains(domain) {
-    return fetchWhoisJSON('/subdomains', { domain });
+    try {
+        return await whoisFetch('/subdomains', { domain });
+    } catch (err) {
+        console.error(`[WHOISJSON] Subdomain discovery failed for ${domain}`);
+        throw err;
+    }
 }
 
 export async function getReverseWhois(query) {
-    // query can be email or company name
-    return fetchWhoisJSON('/reverse-whois', { query });
+    try {
+        return await whoisFetch('/reverse-whois', { query });
+    } catch (err) {
+        console.error(`[WHOISJSON] Reverse WHOIS failed for query: ${query}`);
+        throw err;
+    }
 }

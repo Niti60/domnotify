@@ -11,11 +11,25 @@ import { CardSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { apiFetch, statusToVariant } from '@/lib/apiClient';
 import { LayoutDashboard } from 'lucide-react';
+import { toast } from 'sonner';
+import { getRegistrarInfo } from '@/lib/registrars';
+
+import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const handleRenew = (registrarName, domain) => {
+    const info = getRegistrarInfo(registrarName);
+    if (!info || !info.renewalUrl) {
+      toast.error('Registrar renewal link unavailable');
+      window.open('/registrars', '_blank');
+      return;
+    }
+    window.open(info.renewalUrl, '_blank', 'noopener,noreferrer');
+  };
 
   useEffect(() => {
     apiFetch('/api/dashboard')
@@ -37,6 +51,15 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (error === 'Not authenticated' || error === 'Unauthorized' || error === '401') {
+    return (
+      <AuthRequiredState
+        title="Please login to create your own dashboard"
+        description="Your monitoring data, SSL checks, and watchlist are linked to your account."
+      />
     );
   }
 
@@ -102,14 +125,18 @@ export default function DashboardPage() {
                     <div>
                       <p className="text-base font-semibold text-foreground">{domain.domain}</p>
                       <p className="text-sm text-muted-foreground">
-                        Expires {domain.expiry} · {domain.registrar}
+                        Expires {domain.domainExpiresAt} · {domain.registrar}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <StatusBadge variant={domain.daysLeft <= 10 ? 'danger' : 'warning'}>
                         {domain.daysLeft} days left
                       </StatusBadge>
-                      <Button size="sm" variant="secondary">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleRenew(domain.registrar, domain.domain)}
+                      >
                         Renew
                       </Button>
                     </div>
@@ -154,6 +181,7 @@ export default function DashboardPage() {
                   <th className="px-4 py-3 font-semibold">Renewal</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
                   <th className="px-4 py-3 font-semibold">Last checked</th>
+                  <th className="px-4 py-3 font-semibold text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -164,12 +192,22 @@ export default function DashboardPage() {
                   >
                     <td className="px-4 py-4 font-medium text-foreground">{domain.domain}</td>
                     <td className="px-4 py-4 text-muted-foreground">{domain.registrar}</td>
-                    <td className="px-4 py-4 text-muted-foreground">{domain.expires}</td>
+                    <td className="px-4 py-4 text-muted-foreground">{domain.domainExpiresAt}</td>
                     <td className="px-4 py-4 text-muted-foreground">{domain.renewal}</td>
                     <td className="px-4 py-4">
                       <StatusBadge variant={statusToVariant(domain.status)}>{domain.status}</StatusBadge>
                     </td>
                     <td className="px-4 py-4 text-muted-foreground">{domain.lastChecked}</td>
+                    <td className="px-4 py-4 text-right">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-xs"
+                        onClick={() => handleRenew(domain.registrar, domain.domain)}
+                      >
+                        Renew
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -205,7 +243,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="font-semibold text-foreground">{domain.domain}</p>
                     <p className="text-sm text-muted-foreground">
-                      {domain.registrar} · Expires {domain.expiry}
+                      {domain.registrar} · Expires {domain.domainExpiresAt}
                     </p>
                     {expired && (
                       <p className="mt-1 text-xs font-medium text-destructive">Already expired</p>

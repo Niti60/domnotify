@@ -6,23 +6,23 @@ export const dashboardStats = [
 ];
 
 export const expiringDomains = [
-  { domain: 'workspace.io', expiry: '2025-06-14', daysLeft: 9, registrar: 'Namecheap' },
-  { domain: 'brandhub.co', expiry: '2025-06-28', daysLeft: 23, registrar: 'Cloudflare' },
-  { domain: 'launchpad.dev', expiry: '2025-07-03', daysLeft: 28, registrar: 'Squarespace Domains' },
-  { domain: 'secureapp.com', expiry: '2025-07-14', daysLeft: 39, registrar: 'GoDaddy' },
+  { domain: 'workspace.io', domainExpiresAt: '2025-06-14', daysLeft: 9, registrar: 'Namecheap' },
+  { domain: 'brandhub.co', domainExpiresAt: '2025-06-28', daysLeft: 23, registrar: 'Cloudflare' },
+  { domain: 'launchpad.dev', domainExpiresAt: '2025-07-03', daysLeft: 28, registrar: 'Squarespace Domains' },
+  { domain: 'secureapp.com', domainExpiresAt: '2025-07-14', daysLeft: 39, registrar: 'GoDaddy' },
 ];
 
 export const monitoringDomains = [
-  { domain: 'workspace.io', registrar: 'Namecheap', expires: '2025-06-14', renewal: '$12.99', status: 'Available', lastChecked: '2 hours ago' },
-  { domain: 'brandhub.co', registrar: 'Cloudflare', expires: '2025-06-28', renewal: '$14.50', status: 'Review', lastChecked: '6 hours ago' },
-  { domain: 'launchpad.dev', registrar: 'Squarespace Domains', expires: '2025-07-03', renewal: '$19.00', status: 'Available', lastChecked: '1 day ago' },
-  { domain: 'secureapp.com', registrar: 'GoDaddy', expires: '2025-07-14', renewal: '$18.99', status: 'Pending', lastChecked: '4 hours ago' },
+  { domain: 'workspace.io', registrar: 'Namecheap', domainExpiresAt: '2025-06-14', renewal: '$12.99', status: 'Available', lastChecked: '2 hours ago' },
+  { domain: 'brandhub.co', registrar: 'Cloudflare', domainExpiresAt: '2025-06-28', renewal: '$14.50', status: 'Review', lastChecked: '6 hours ago' },
+  { domain: 'launchpad.dev', registrar: 'Squarespace Domains', domainExpiresAt: '2025-07-03', renewal: '$19.00', status: 'Available', lastChecked: '1 day ago' },
+  { domain: 'secureapp.com', registrar: 'GoDaddy', domainExpiresAt: '2025-07-14', renewal: '$18.99', status: 'Pending', lastChecked: '4 hours ago' },
 ];
 
 export const sslCertificates = [
-  { domain: 'workspace.io', issuer: 'Let’s Encrypt', expires: '2025-06-10', daysLeft: 5, status: 'Renew soon' },
-  { domain: 'brandhub.co', issuer: 'DigiCert', expires: '2025-07-03', daysLeft: 28, status: 'Valid' },
-  { domain: 'secureapp.com', issuer: 'Comodo', expires: '2025-05-20', daysLeft: -10, status: 'Expired' },
+  { domain: 'workspace.io', issuer: 'Let’s Encrypt', sslExpiresAt: '2025-06-10', daysLeft: 5, status: 'Renew soon' },
+  { domain: 'brandhub.co', issuer: 'DigiCert', sslExpiresAt: '2025-07-03', daysLeft: 28, status: 'Valid' },
+  { domain: 'secureapp.com', issuer: 'Comodo', sslExpiresAt: '2025-05-20', daysLeft: -10, status: 'Expired' },
 ];
 
 export const whoisData = {
@@ -38,12 +38,12 @@ export const whoisData = {
 };
 
 export const watchlistDomains = [
-  { domain: 'futurestack.ai', registrar: 'Namecheap', expiry: '2025-11-12', status: 'Available', score: 91, price: '$2,900' },
-  { domain: 'growthlabs.dev', registrar: 'Cloudflare', expiry: '2025-06-14', status: 'Expiring soon', score: 84, price: '$1,650' },
-  { domain: 'launchcode.app', registrar: 'Squarespace Domains', expiry: '2025-07-03', status: 'Available', score: 78, price: '$740' },
-  { domain: 'cloudpilot.io', registrar: 'Namecheap', expiry: '2025-06-18', status: 'Expiring soon', score: 70, price: '$1,100' },
-  { domain: 'motiongrid.co', registrar: 'GoDaddy', expiry: '2025-05-10', status: 'Expired', score: 65, price: '$1,250' },
-  { domain: 'stackverse.ai', registrar: 'Cloudflare', expiry: '2025-06-20', status: 'Expiring soon', score: 80, price: '$1,400' },
+  { domain: 'futurestack.ai', registrar: 'Namecheap', domainExpiresAt: '2025-11-12', status: 'Available', score: 91, price: '$2,900' },
+  { domain: 'growthlabs.dev', registrar: 'Cloudflare', domainExpiresAt: '2025-06-14', status: 'Expiring soon', score: 84, price: '$1,650' },
+  { domain: 'launchcode.app', registrar: 'Squarespace Domains', domainExpiresAt: '2025-07-03', status: 'Available', score: 78, price: '$740' },
+  { domain: 'cloudpilot.io', registrar: 'Namecheap', domainExpiresAt: '2025-06-18', status: 'Expiring soon', score: 70, price: '$1,100' },
+  { domain: 'motiongrid.co', registrar: 'GoDaddy', domainExpiresAt: '2025-05-10', status: 'Expired', score: 65, price: '$1,250' },
+  { domain: 'stackverse.ai', registrar: 'Cloudflare', domainExpiresAt: '2025-06-20', status: 'Expiring soon', score: 80, price: '$1,400' },
 ];
 
 export const pricingPlans = [

@@ -10,11 +10,24 @@ import { CardSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { apiFetch, statusToVariant } from '@/lib/apiClient';
 import { Activity } from 'lucide-react';
+import { toast } from 'sonner';
+import { getRegistrarInfo } from '@/lib/registrars';
+import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
 export default function MonitoringPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const handleRenew = (registrarName) => {
+    const info = getRegistrarInfo(registrarName);
+    if (!info || !info.renewalUrl) {
+      toast.error('Registrar renewal link unavailable');
+      window.open('/registrars', '_blank');
+      return;
+    }
+    window.open(info.renewalUrl, '_blank', 'noopener,noreferrer');
+  };
 
   useEffect(() => {
     apiFetch('/api/monitoring')
@@ -32,6 +45,15 @@ export default function MonitoringPage() {
           <CardSkeleton />
         </div>
       </div>
+    );
+  }
+
+  if (error === 'Not authenticated' || error === 'Unauthorized' || error === '401') {
+    return (
+      <AuthRequiredState
+        title="Please login to view monitoring data"
+        description="Your monitoring data, SSL checks, and watchlist are linked to your account."
+      />
     );
   }
 
@@ -136,7 +158,7 @@ export default function MonitoringPage() {
                     <th className="px-4 py-3 font-semibold">Expires</th>
                     <th className="px-4 py-3 font-semibold">Renewal</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
-                    <th className="px-4 py-3 font-semibold">Last checked</th>
+                    <th className="px-4 py-3 font-semibold text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -147,12 +169,21 @@ export default function MonitoringPage() {
                     >
                       <td className="px-4 py-4 font-medium text-foreground">{item.domain}</td>
                       <td className="px-4 py-4 text-muted-foreground">{item.registrar}</td>
-                      <td className="px-4 py-4 text-muted-foreground">{item.expires}</td>
+                      <td className="px-4 py-4 text-muted-foreground">{item.domainExpiresAt}</td>
                       <td className="px-4 py-4 text-muted-foreground">{item.renewal}</td>
                       <td className="px-4 py-4">
                         <StatusBadge variant={statusToVariant(item.status)}>{item.status}</StatusBadge>
                       </td>
-                      <td className="px-4 py-4 text-muted-foreground">{item.lastChecked}</td>
+                      <td className="px-4 py-4 text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-xs"
+                          onClick={() => handleRenew(item.registrar)}
+                        >
+                          Renew
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

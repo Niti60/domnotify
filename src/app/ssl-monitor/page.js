@@ -11,6 +11,7 @@ import { CardSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { apiFetch, statusToVariant } from '@/lib/apiClient';
 import { ShieldAlert, ChevronDown, ChevronUp, Lock, Calendar, Fingerprint, Activity } from 'lucide-react';
+import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
 export default function SSLMonitorPage() {
   const [data, setData] = useState(null);
@@ -39,6 +40,15 @@ export default function SSLMonitorPage() {
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (error === 'Not authenticated' || error === 'Unauthorized' || error === '401') {
+    return (
+      <AuthRequiredState
+        title="Please login to monitor SSL certificates"
+        description="Your monitoring data, SSL checks, and watchlist are linked to your account."
+      />
     );
   }
 
@@ -121,14 +131,24 @@ export default function SSLMonitorPage() {
                     <div>
                       <p className="font-bold text-foreground text-lg">{cert.domain}</p>
                       <p className="text-sm text-muted-foreground">
-                        {cert.sslIssuer} · <span className={cert.sslStatus === 'Expired' ? 'text-red-500 font-medium' : ''}>Expires {cert.expires}</span>
+                        {cert.sslIssuer} · <span className={cert.sslStatus === 'Expired' ? 'text-red-500 font-medium' : ''}>SSL expires {cert.sslExpiresAt}</span>
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="text-right hidden sm:block">
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest">Last Check</p>
-                      <p className="text-sm font-medium">{cert.lastChecked}</p>
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest">Health check</p>
+                      <p className="text-sm font-medium">
+                        {cert.sslDaysLeft !== null ? (
+                          cert.sslDaysLeft < 0 ? (
+                            <span className="text-red-500">Expired</span>
+                          ) : (
+                            <span className={cert.sslDaysLeft <= 30 ? 'text-amber-500' : 'text-emerald-500'}>
+                              SSL expires in {cert.sslDaysLeft} days
+                            </span>
+                          )
+                        ) : '—'}
+                      </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <StatusBadge variant={statusToVariant(cert.sslStatus)}>{cert.sslStatus}</StatusBadge>
@@ -151,12 +171,12 @@ export default function SSLMonitorPage() {
                         </div>
                         <div className="space-y-1">
                           <p className="text-sm text-foreground flex justify-between">
-                            <span className="text-muted-foreground">From:</span>
-                            <span className="font-medium">{cert.sslValidFrom || 'N/A'}</span>
+                            <span className="text-muted-foreground">Certificate issued:</span>
+                            <span className="font-medium">{cert.sslValidFromAt || '—'}</span>
                           </p>
                           <p className="text-sm text-foreground flex justify-between">
-                            <span className="text-muted-foreground">To:</span>
-                            <span className="font-medium">{cert.sslValidTo || 'N/A'}</span>
+                            <span className="text-muted-foreground">Certificate expires:</span>
+                            <span className="font-medium">{cert.sslValidToAt || '—'}</span>
                           </p>
                         </div>
                       </div>

@@ -6,7 +6,8 @@ import SearchHistory from '@/models/SearchHistory';
 export async function GET(req) {
   try {
     const auth = requireAuth(req);
-    if (auth.error) return auth.error;
+    // Remove strict auth check to allow unauthenticated searches
+    const userId = auth.userId;
 
     const { searchParams } = new URL(req.url);
     const query = searchParams.get('q')?.trim().toLowerCase();
@@ -20,11 +21,14 @@ export async function GET(req) {
 
     await ensureDb();
 
-    await SearchHistory.create({
-      user: auth.userId,
-      query,
-      searchedAt: new Date(),
-    });
+    // Only save history if user is logged in
+    if (userId) {
+      await SearchHistory.create({
+        user: userId,
+        query,
+        searchedAt: new Date(),
+      });
+    }
 
     const results = await searchDomains(query);
 

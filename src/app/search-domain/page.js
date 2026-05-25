@@ -12,9 +12,11 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { apiFetch } from '@/lib/apiClient';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SearchDomainPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,14 +34,19 @@ export default function SearchDomainPage() {
         setWatchlist(res.domains.map(d => ({ domainName: d.domainName, _id: d._id })));
       }
     } catch (err) {
-      console.error('Failed to load watchlist:', err);
+      // Don't show error for watchlist load on search page if unauthenticated
+      if (err.message !== 'Not authenticated' && err.message !== 'Unauthorized' && err.message !== '401') {
+        console.error('Failed to load watchlist:', err);
+      }
     }
   }, []);
 
   const loadHistory = useCallback(() => {
     apiFetch('/api/search-history')
       .then((res) => setHistory(res.history || []))
-      .catch(() => { });
+      .catch((err) => {
+        // Silently fail for history if unauthenticated
+      });
   }, []);
 
   useEffect(() => {
@@ -82,6 +89,11 @@ export default function SearchDomainPage() {
   };
 
   const toggleWatchlist = async (result) => {
+    if (!user) {
+      toast('Login required to save domains');
+      return;
+    }
+
     const existing = watchlist.find(w => w.domainName.toLowerCase() === result.domain.toLowerCase());
     const isAdding = !existing;
 

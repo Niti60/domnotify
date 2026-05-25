@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { ProfilePictureUpload } from '@/components/auth/ProfilePictureUpload';
 import { cn } from '@/lib/cn';
+import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -64,6 +65,7 @@ function SettingsInput({ label, icon: Icon, error, readOnly, ...props }) {
     </div>
   );
 }
+
 
 export default function MePage() {
   const { user, loading: authLoading, logout, refreshUser } = useAuth();
@@ -142,21 +144,10 @@ export default function MePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="text-center space-y-4">
-          <div className="bg-card border border-border p-8 rounded-3xl shadow-sm max-w-md">
-            <AlertCircle className="mx-auto text-muted-foreground mb-4" size={48} />
-            <h2 className="text-xl font-bold text-foreground">Session Expired</h2>
-            <p className="text-muted-foreground text-sm mt-2">Please login again to access your profile.</p>
-            <button
-              onClick={() => window.location.href = '/auth'}
-              className="mt-6 w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all"
-            >
-              Go to Login
-            </button>
-          </div>
-        </div>
-      </div>
+      <AuthRequiredState
+        title="Session Expired"
+        description="Please login again to access your profile and account settings."
+      />
     );
   }
 

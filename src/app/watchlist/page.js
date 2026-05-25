@@ -10,6 +10,9 @@ import { TableSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { apiFetch, statusToVariant } from '@/lib/apiClient';
 import { Eye } from 'lucide-react';
+import { toast } from 'sonner';
+import { getRegistrarInfo } from '@/lib/registrars';
+import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
 export default function WatchlistPage() {
   const [domains, setDomains] = useState([]);
@@ -25,6 +28,16 @@ export default function WatchlistPage() {
     renewalPrice: '',
   });
 
+  const handleRenew = (registrarName) => {
+    const info = getRegistrarInfo(registrarName);
+    if (!info || !info.renewalUrl) {
+      toast.error('Registrar renewal link unavailable');
+      window.open('/registrars', '_blank');
+      return;
+    }
+    window.open(info.renewalUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const loadWatchlist = useCallback(() => {
     setLoading(true);
     apiFetch('/api/watchlist')
@@ -36,6 +49,15 @@ export default function WatchlistPage() {
   useEffect(() => {
     loadWatchlist();
   }, [loadWatchlist]);
+
+  if (error === 'Not authenticated' || error === 'Unauthorized' || error === '401') {
+    return (
+      <AuthRequiredState
+        title="Please login to manage your watchlist"
+        description="Your monitoring data, SSL checks, and watchlist are linked to your account."
+      />
+    );
+  }
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -158,7 +180,7 @@ export default function WatchlistPage() {
                       <td className="px-4 py-4 text-muted-foreground">{row.registrar}</td>
                       <td className="px-4 py-4 text-muted-foreground">
                         <div className="flex flex-col">
-                          <span>{row.expiry}</span>
+                          <span>{row.domainExpiresAt}</span>
                           {expired && (
                             <span className="mt-1 text-xs font-medium text-destructive">
                               Already expired
@@ -170,17 +192,25 @@ export default function WatchlistPage() {
                         <StatusBadge variant={statusToVariant(row.status)}>{row.status}</StatusBadge>
                       </td>
                       <td className="px-4 py-4">
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(row._id)}
-                          className={`text-sm font-medium transition-colors underline-offset-4 hover:underline ${
-                            expired
+                        <div className="flex items-center gap-4">
+                          <button
+                            type="button"
+                            onClick={() => handleRenew(row.registrar)}
+                            className="text-sm font-medium text-primary transition-colors underline-offset-4 hover:underline"
+                          >
+                            Renew
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemove(row._id)}
+                            className={`text-sm font-medium transition-colors underline-offset-4 hover:underline ${expired
                               ? 'text-destructive'
                               : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          Remove
-                        </button>
+                              }`}
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
