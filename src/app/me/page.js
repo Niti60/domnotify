@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion } from 'framer-motion';
@@ -15,9 +15,9 @@ import {
   LogOut,
   CheckCircle2,
   AlertCircle,
-  Loader2
+  Loader2,
+  Crown
 } from 'lucide-react';
-import { ProfilePictureUpload } from '@/components/auth/ProfilePictureUpload';
 import { cn } from '@/lib/cn';
 import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
@@ -25,7 +25,6 @@ const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   role: z.enum(['student', 'developer', 'entrepreneur', 'company']),
   companyName: z.string().optional(),
-  profilePic: z.string().optional(),
 }).superRefine((data, ctx) => {
   if (['entrepreneur', 'company'].includes(data.role) && (!data.companyName || data.companyName.trim() === '')) {
     ctx.addIssue({
@@ -77,7 +76,6 @@ export default function MePage() {
     register,
     handleSubmit,
     watch,
-    control,
     reset,
     formState: { errors }
   } = useForm({
@@ -86,7 +84,6 @@ export default function MePage() {
       name: '',
       role: 'student',
       companyName: '',
-      profilePic: ''
     }
   });
 
@@ -98,7 +95,6 @@ export default function MePage() {
         name: user.name || '',
         role: user.role || 'student',
         companyName: user.companyName || '',
-        profilePic: user.profilePic || ''
       });
     }
   }, [user, reset]);
@@ -160,21 +156,7 @@ export default function MePage() {
           className="bg-card border border-border rounded-[2rem] shadow-xl overflow-hidden"
         >
           {/* Header Section */}
-          <div className="relative h-32 bg-blue-600/10 border-b border-border/50">
-            <div className="absolute -bottom-12 left-8">
-              <Controller
-                name="profilePic"
-                control={control}
-                render={({ field }) => (
-                  <ProfilePictureUpload
-                    value={field.value}
-                    onChange={field.onChange}
-                    error={errors.profilePic?.message}
-                    className="large !mb-0"
-                  />
-                )}
-              />
-            </div>
+          <div className="relative h-32 bg-gradient-to-r from-blue-600/10 to-purple-600/10 border-b border-border/50">
             <div className="absolute right-8 top-8">
               <button
                 onClick={logout}
@@ -186,16 +168,24 @@ export default function MePage() {
             </div>
           </div>
 
-          <div className="pt-16 pb-10 px-8">
-            <div className="mb-10">
-              <h1 className="text-2xl font-bold text-foreground">{user.name}</h1>
-              <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
-                <Mail size={14} />
-                {user.email}
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-700/50 ml-2">
-                  {user.role}
-                </span>
-              </p>
+          <div className="pt-8 pb-10 px-8">
+            <div className="mb-8 flex items-start justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">{user.name}</h1>
+                <p className="text-sm text-muted-foreground flex items-center gap-2 mt-2">
+                  <Mail size={14} />
+                  {user.email}
+                </p>
+                <div className="flex items-center gap-2 mt-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-700/50">
+                    {user.role}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200/50 dark:border-purple-700/50">
+                    <Crown size={12} />
+                    {user.isPremiumUser ? user.premiumPlanType?.charAt(0).toUpperCase() + user.premiumPlanType?.slice(1) : 'Free'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit(onUpdateProfile)} className="space-y-6">

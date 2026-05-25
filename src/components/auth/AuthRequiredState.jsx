@@ -10,8 +10,12 @@ export default function AuthRequiredState({
     description = "Please login to access this page and manage your domain data.",
     showLoginButton = true
 }) {
+    const nextPath = typeof window !== 'undefined'
+        ? `${window.location.pathname}${window.location.search}`
+        : '/dashboard';
+
     return (
-        <div className="flex min-h-[400px] w-full flex-col items-center justify-center p-8 text-center sm:p-12 animate-in fade-in duration-500">
+        <div className="flex min-h-100 w-full flex-col items-center justify-center p-8 text-center sm:p-12 animate-in fade-in duration-500">
             <Card className="flex max-w-md flex-col items-center border-dashed bg-card/50 p-12 transition-all hover:border-muted-foreground/30">
                 <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                     <Lock className="h-8 w-8 text-muted-foreground" />
@@ -26,7 +30,7 @@ export default function AuthRequiredState({
                 </p>
 
                 {showLoginButton && (
-                    <Link href="/auth">
+                    <Link href={`/auth?next=${encodeURIComponent(nextPath)}`}>
                         <Button
                             variant="primary"
                             className="px-8 shadow-lg shadow-blue-500/10"

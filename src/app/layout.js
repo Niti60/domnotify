@@ -4,13 +4,23 @@ import { LayoutWrapper } from '@/components/layout/LayoutWrapper';
 import { AuthProvider } from '@/context/AuthContext';
 import Script from 'next/script';
 import './globals.css';
+import { getCurrentUser } from '@/lib/auth';
 
 export const metadata = {
   title: 'DomNotify - Domain Intelligence Platform',
   description: 'Monitor domains, track SSL, compare registrars, and get AI suggestions for your domain portfolio.',
 };
 
-export default function RootLayout({ children }) {
+/**
+ * RootLayout
+ * 
+ * Note: Middleware provides the primary auth gate.
+ * Protected routes never reach this layout without valid auth token.
+ * This layout renders the UI chrome for authenticated users.
+ */
+export default async function RootLayout({ children }) {
+  const initialUser = await getCurrentUser();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -35,7 +45,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className="min-h-screen bg-background text-foreground transition-colors duration-200" suppressHydrationWarning>
         <Providers>
-          <AuthProvider>
+          <AuthProvider initialUser={initialUser}>
             <LayoutWrapper>{children}</LayoutWrapper>
             <Toaster position="top-right" richColors />
           </AuthProvider>

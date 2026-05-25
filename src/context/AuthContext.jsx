@@ -1,48 +1,68 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext({
   user: null,
-  loading: true,
+  loading: false,
   refreshUser: async () => { },
   logout: async () => { }
 });
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+/**
+ * AuthProvider
+ * 
+ * Note: Route protection is primarily handled by Next.js middleware.
+ * This context is responsible for:
+ * 1. Fetching and caching user profile data
+ * 2. Providing logout functionality
+ * 3. Tracking auth loading state for UI
+ * 
+ * By the time a protected page reaches this component, middleware has
+ * already verified the user's JWT token is valid.
+ */
+export function AuthProvider({ children, initialUser = null }) {
+  const [user, setUser] = useState(initialUser);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const fetchUser = async () => {
+  const refreshUser = async () => {
     try {
-      const res = await fetch('/api/auth/me');
+      const controller = new AbortController();
+      // Timeout after 5 seconds to avoid hanging
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      const res = await fetch('/api/auth/me', {
+        credentials: 'include',
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
       if (res.ok) {
         const json = await res.json();
         setUser(json.user);
       } else {
+        // Auth endpoint returned error - user likely unauthenticated
         setUser(null);
       }
     } catch (err) {
-      console.error("Auth initialization error:", err);
+      console.error("[Auth] Initialization error:", err);
       setUser(null);
-    } finally {
-      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { 
+        method: 'POST',
+        credentials: 'include',
+      });
       // Also clear any legacy localStorage tokens
       localStorage.removeItem('token');
     } catch (err) {
-      console.error("Logout error:", err);
+      console.error("[Auth] Logout error:", err);
     }
     setUser(null);
     router.push('/auth');
@@ -52,11 +72,15 @@ export function AuthProvider({ children }) {
     user,
     setUser,
     loading,
-    refreshUser: fetchUser,
+    refreshUser,
     logout
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

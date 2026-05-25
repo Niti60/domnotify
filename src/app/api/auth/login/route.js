@@ -3,6 +3,7 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { generateToken } from "@/lib/jwt";
 import { NextResponse } from "next/server";
+import { serializeAuthUser } from "@/lib/serializers/user";
 
 export async function POST(req) {
   try {
@@ -50,6 +51,10 @@ export async function POST(req) {
       );
     }
 
+    // Record last login
+    user.lastLogin = new Date();
+    await user.save();
+
     const token = generateToken(user);
 
     const response = NextResponse.json(
@@ -57,14 +62,7 @@ export async function POST(req) {
         success: true,
         message: "Login successful",
         token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          companyName: user.companyName,
-          profilePic: user.profilePic,
-        },
+        user: serializeAuthUser(user),
       },
       { status: 200 }
     );

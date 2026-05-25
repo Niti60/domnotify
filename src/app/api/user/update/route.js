@@ -27,7 +27,7 @@ export async function PATCH(req) {
         await connectDB();
 
         const body = await req.json();
-        const { name, role, companyName, profilePic } = body;
+        const { name, role, companyName } = body;
 
         // Validation
         if (!name || !role) {
@@ -58,7 +58,6 @@ export async function PATCH(req) {
                 name,
                 role,
                 companyName: ["entrepreneur", "company"].includes(role) ? companyName : null,
-                profilePic: profilePic || undefined,
             },
             { new: true, runValidators: true }
         ).select("-password");

@@ -14,8 +14,6 @@ import { LayoutDashboard } from 'lucide-react';
 import { toast } from 'sonner';
 import { getRegistrarInfo } from '@/lib/registrars';
 
-import AuthRequiredState from '@/components/auth/AuthRequiredState';
-
 export default function DashboardPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,15 +49,6 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
-    );
-  }
-
-  if (error === 'Not authenticated' || error === 'Unauthorized' || error === '401') {
-    return (
-      <AuthRequiredState
-        title="Please login to create your own dashboard"
-        description="Your monitoring data, SSL checks, and watchlist are linked to your account."
-      />
     );
   }
 

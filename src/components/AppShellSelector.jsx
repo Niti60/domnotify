@@ -6,8 +6,8 @@ import { LayoutWrapper } from '@/components/layout/LayoutWrapper';
 export function AppShellSelector({ children }) {
   const pathname = usePathname();
 
-  // For auth routes we don't want the main app shell (sidebar/navbar)
-  if (pathname && pathname.startsWith('/auth')) {
+  // For auth and wait routes we don't want the main app shell (sidebar/navbar)
+  if (pathname && (pathname.startsWith('/auth') || pathname === '/wait')) {
     return <>{children}</>;
   }
 

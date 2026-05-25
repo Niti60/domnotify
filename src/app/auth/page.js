@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -20,9 +21,6 @@ import {
 } from 'lucide-react';
 import { Logo } from '../../components/ui/Logo';
 import { cn } from '@/lib/cn';
-import { useAuth } from '@/context/AuthContext';
-import { ProfilePictureUpload } from '../../components/auth/ProfilePictureUpload';
-import { Controller } from 'react-hook-form';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -34,7 +32,6 @@ const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   role: z.enum(['student', 'developer', 'entrepreneur', 'company']),
   companyName: z.string().optional(),
-  profilePic: z.string().optional(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(8, 'Confirm password is required'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -94,12 +91,21 @@ function AuthInput({ label, icon: Icon, error, ...props }) {
   );
 }
 
-export default function AuthPage() {
+function AuthPageContent() {
   const router = useRouter();
-  const { refreshUser } = useAuth();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
   const [apiError, setApiError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const getSafeNextPath = () => {
+    const nextPath = searchParams.get('next');
+    if (!nextPath || !nextPath.startsWith('/')) {
+      return '/dashboard';
+    }
+
+    return nextPath;
+  };
 
   const {
     register: registerLogin,
@@ -115,7 +121,6 @@ export default function AuthPage() {
     register: registerRegister,
     handleSubmit: handleRegisterSubmit,
     watch,
-    control,
     formState: { errors: registerErrors },
     reset: resetRegister,
   } = useForm({
@@ -125,7 +130,6 @@ export default function AuthPage() {
       email: '',
       role: 'student',
       companyName: '',
-      profilePic: '',
       password: '',
       confirmPassword: ''
     }
@@ -154,10 +158,8 @@ export default function AuthPage() {
         localStorage.setItem('token', json.token);
       }
 
-      // Force refresh user state in context
-      await refreshUser();
-
-      router.push('/dashboard');
+      const destination = json?.user?.isAdmin ? '/admin' : getSafeNextPath();
+      router.replace(destination);
     } catch (err) {
       setApiError('Unable to connect to the server. Please try again.');
       setLoading(false);
@@ -185,10 +187,8 @@ export default function AuthPage() {
         localStorage.setItem('token', json.token);
       }
 
-      // Since register route now sets the cookie (auto-login), 
-      // we just refresh the context and redirect.
-      await refreshUser();
-      router.push('/dashboard');
+      const destination = json?.user?.isAdmin ? '/admin' : getSafeNextPath();
+      router.replace(destination);
     } catch (err) {
       setApiError('Network error. Check your connection and try again.');
       setLoading(false);
@@ -197,7 +197,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-[440px] animate-in fade-in zoom-in duration-500">
+      <div className="w-full max-w-md animate-in fade-in zoom-in duration-500">
         {/* Header section */}
         <div className="flex flex-col items-center justify-center mb-8 text-center">
           <Logo className="mb-4" />
@@ -322,18 +322,6 @@ export default function AuthPage() {
                   onSubmit={handleRegisterSubmit(onRegister)}
                   className="space-y-4"
                 >
-                  <Controller
-                    name="profilePic"
-                    control={control}
-                    render={({ field }) => (
-                      <ProfilePictureUpload
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={registerErrors.profilePic?.message}
-                      />
-                    )}
-                  />
-
                   <div className="grid grid-cols-2 gap-4">
                     <AuthInput
                       id="reg-name"
@@ -451,5 +439,13 @@ export default function AuthPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <AuthPageContent />
+    </Suspense>
   );
 }

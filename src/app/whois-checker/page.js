@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { apiFetch } from '@/lib/apiClient';
-import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
 export default function WhoisCheckerPage() {
   const searchParams = useSearchParams();
@@ -37,12 +36,8 @@ export default function WhoisCheckerPage() {
         setError(response.message || 'Failed to fetch WHOIS data');
       }
     } catch (err) {
-      if (err.message === 'Not authenticated' || err.message === 'Unauthorized' || err.message === '401') {
-        setError('auth-required');
-      } else {
-        setError('An error occurred while fetching data');
-        console.error(err);
-      }
+      setError('An error occurred while fetching data');
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -55,15 +50,6 @@ export default function WhoisCheckerPage() {
       handleCheck(domainParam);
     }
   }, [searchParams, handleCheck]);
-
-  if (error === 'auth-required') {
-    return (
-      <AuthRequiredState
-        title="Please login to use Whois Checker"
-        description="Detailed domain registration and DNS lookup data requires an active account."
-      />
-    );
-  }
 
   const copyText = (text) => {
     if (!text) return;

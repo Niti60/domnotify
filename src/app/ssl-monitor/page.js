@@ -11,7 +11,6 @@ import { CardSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { apiFetch, statusToVariant } from '@/lib/apiClient';
 import { ShieldAlert, ChevronDown, ChevronUp, Lock, Calendar, Fingerprint, Activity } from 'lucide-react';
-import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
 export default function SSLMonitorPage() {
   const [data, setData] = useState(null);
@@ -40,15 +39,6 @@ export default function SSLMonitorPage() {
           ))}
         </div>
       </div>
-    );
-  }
-
-  if (error === 'Not authenticated' || error === 'Unauthorized' || error === '401') {
-    return (
-      <AuthRequiredState
-        title="Please login to monitor SSL certificates"
-        description="Your monitoring data, SSL checks, and watchlist are linked to your account."
-      />
     );
   }
 

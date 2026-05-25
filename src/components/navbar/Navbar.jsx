@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu } from 'lucide-react';
+import { Menu, User as UserIcon } from 'lucide-react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Logo } from '@/components/ui/Logo';
@@ -89,26 +88,14 @@ function AuthStatus() {
     );
   }
 
-  const initial = user.name ? user.name.charAt(0).toUpperCase() : 'U';
-
   return (
     <button
       onClick={() => router.push('/me')}
-      className="ml-2 inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground text-sm font-medium hover:opacity-90 transition-opacity duration-150 overflow-hidden"
-      aria-label="Account"
+      className="ml-2 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted/50 transition-colors duration-150"
+      aria-label="Account settings"
+      title={user.name}
     >
-      {user.profilePic ? (
-        <Image
-          src={user.profilePic}
-          alt={user.name || 'avatar'}
-          width={36}
-          height={36}
-          className="h-full w-full object-cover"
-          style={{ height: 'auto' }}
-        />
-      ) : (
-        <span className="h-full w-full inline-flex items-center justify-center rounded-full bg-blue-600 text-white">{initial}</span>
-      )}
+      <UserIcon size={18} className="text-muted-foreground" />
     </button>
   );
 }

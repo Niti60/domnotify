@@ -3,6 +3,7 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { generateToken } from "@/lib/jwt";
+import { serializeAuthUser } from "@/lib/serializers/user";
 
 export async function POST(req) {
   try {
@@ -17,7 +18,6 @@ export async function POST(req) {
       confirmPassword,
       role,
       companyName,
-      profilePic,
     } = body;
 
     // Validation
@@ -63,7 +63,6 @@ export async function POST(req) {
       password: hashedPassword,
       role,
       companyName: ["entrepreneur", "company"].includes(role) ? companyName : null,
-      profilePic: profilePic || undefined,
     });
 
     // AUTO LOGIN: Generate token and set cookie
@@ -74,12 +73,7 @@ export async function POST(req) {
         success: true,
         message: "Registration successful",
         token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+        user: serializeAuthUser(user),
       },
       { status: 201 }
     );

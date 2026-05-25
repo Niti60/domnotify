@@ -12,7 +12,6 @@ import { apiFetch, statusToVariant } from '@/lib/apiClient';
 import { Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { getRegistrarInfo } from '@/lib/registrars';
-import AuthRequiredState from '@/components/auth/AuthRequiredState';
 
 export default function WatchlistPage() {
   const [domains, setDomains] = useState([]);
@@ -49,15 +48,6 @@ export default function WatchlistPage() {
   useEffect(() => {
     loadWatchlist();
   }, [loadWatchlist]);
-
-  if (error === 'Not authenticated' || error === 'Unauthorized' || error === '401') {
-    return (
-      <AuthRequiredState
-        title="Please login to manage your watchlist"
-        description="Your monitoring data, SSL checks, and watchlist are linked to your account."
-      />
-    );
-  }
 
   const handleAdd = async (e) => {
     e.preventDefault();

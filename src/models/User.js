@@ -38,11 +38,6 @@ const UserSchema = new mongoose.Schema(
       default: null,
     },
 
-    profilePic: {
-      type: String,
-      default: "https://res.cloudinary.com/dkczwvm0e/image/upload/v1779547451/fallback-logo_dcsvvs.png",
-    },
-
     authProvider: {
       type: String,
       enum: ["credentials", "google"],
@@ -52,6 +47,28 @@ const UserSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: false,
+    },
+
+    isPremiumUser: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    premiumPlanType: {
+      type: String,
+      default: null,
+    },
+
+    isAdmin: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+
+    lastLogin: {
+      type: Date,
+      default: null,
     },
   },
   {
