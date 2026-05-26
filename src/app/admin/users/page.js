@@ -19,29 +19,39 @@ export default function AdminUsersPage() {
   const [filterPremium, setFilterPremium] = useState('');
   const [deleting, setDeleting] = useState(null);
 
-  const loadUsers = async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page,
-        limit: 20,
-        ...(search && { search }),
-        ...(filterPremium && { filterPremium }),
-      });
-
-      const data = await apiFetch(`/api/admin/users?${params}`);
-      setUsers(data.data);
-      setPagination(data.pagination);
-    } catch (err) {
-      toast.error('Failed to load users');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadUsers();
+    let active = true;
+
+    (async () => {
+      try {
+        const params = new URLSearchParams({
+          page,
+          limit: 20,
+          ...(search && { search }),
+          ...(filterPremium && { filterPremium }),
+        });
+
+        const data = await apiFetch(`/api/admin/users?${params}`);
+
+        if (!active) return;
+
+        setUsers(data.data);
+        setPagination(data.pagination);
+      } catch (err) {
+        if (!active) return;
+
+        toast.error('Failed to load users');
+        console.error(err);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
   }, [page, search, filterPremium]);
 
   const handleDeleteUser = async (userId, userName) => {
@@ -55,7 +65,17 @@ export default function AdminUsersPage() {
         method: 'DELETE',
       });
       toast.success('User deleted successfully');
-      loadUsers();
+
+      const params = new URLSearchParams({
+        page,
+        limit: 20,
+        ...(search && { search }),
+        ...(filterPremium && { filterPremium }),
+      });
+
+      const data = await apiFetch(`/api/admin/users?${params}`);
+      setUsers(data.data);
+      setPagination(data.pagination);
     } catch (err) {
       toast.error(err.message || 'Failed to delete user');
     } finally {
@@ -174,7 +194,7 @@ export default function AdminUsersPage() {
               ) : (
                 users.map((user) => (
                   <tr
-                    key={user._id}
+                      key={String(user._id)}
                     className="border-b border-border hover:bg-muted/30 transition-colors"
                   >
                     <td className="px-6 py-4">
@@ -204,15 +224,15 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                       <span suppressHydrationWarning>
-                        {user.createdAt ? (
-                          new Date(user.createdAt).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          })
-                        ) : (
-                          '—'
-                        )}
+                          {user.createdAt ? (
+                            new Date(user.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          ) : (
+                            '—'
+                          )}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">

@@ -16,7 +16,6 @@ export default function AdminActivityPage() {
   const [activityType, setActivityType] = useState('login');
 
   useEffect(() => {
-    setLoading(true);
     apiFetch(`/api/admin/activity?type=${activityType}&page=${page}&limit=50`)
       .then((data) => {
         setActivity(data.data);
@@ -107,7 +106,7 @@ export default function AdminActivityPage() {
               ) : (
                 activity.map((item) => (
                   <tr
-                    key={item._id}
+                    key={String(item._id)}
                     className="border-b border-border hover:bg-muted/30 transition-colors"
                   >
                     <td className="px-6 py-4">

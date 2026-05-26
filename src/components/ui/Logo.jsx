@@ -30,7 +30,6 @@ export function Logo({ className = '', priority = false }) {
           width={32}
           height={32}
           priority={priority}
-          style={{ height: 'auto' }}
         />
       </div>
       <div className="hidden items-center md:flex">
@@ -40,7 +39,6 @@ export function Logo({ className = '', priority = false }) {
           width={160}
           height={36}
           priority={priority}
-          style={{ height: 'auto' }}
         />
       </div>
     </div>

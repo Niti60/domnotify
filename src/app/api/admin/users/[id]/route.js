@@ -4,7 +4,7 @@ import Domain from "@/models/Domain";
 import { NextResponse } from "next/server";
 import { adminGuard, adminUnauthorized } from "@/middlewares/admin.middleware";
 import bcryptjs from "bcryptjs";
-import { serializeAuthUser } from "@/lib/serializers/user";
+import { serializeUser } from "@/lib/serializers/user";
 
 /**
  * GET /api/admin/users/[id]
@@ -45,7 +45,7 @@ export async function GET(req, { params }) {
       {
         success: true,
         user: {
-          ...serializeAuthUser(user),
+          ...serializeUser(user),
           watchlistCount,
           totalDomains,
         },
@@ -115,7 +115,7 @@ export async function PATCH(req, { params }) {
       {
         success: true,
         message: "User updated successfully",
-        user: serializeAuthUser(user),
+        user: serializeUser(user),
       },
       { status: 200 }
     );

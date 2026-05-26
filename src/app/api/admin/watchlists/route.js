@@ -3,7 +3,7 @@ import Domain from "@/models/Domain";
 import User from "@/models/User";
 import { NextResponse } from "next/server";
 import { adminGuard, adminUnauthorized } from "@/middlewares/admin.middleware";
-import { serializeAuthUser } from "@/lib/serializers/user";
+import { serializeUser } from "@/lib/serializers/user";
 
 /**
  * GET /api/admin/watchlists
@@ -39,10 +39,10 @@ export async function GET(req) {
     // Group by user for better stats
     const grouped = {};
     watchlists.forEach((domain) => {
-      const userId = domain.user._id;
+      const userId = domain.user?._id?.toString?.() ?? String(domain.user?._id);
       if (!grouped[userId]) {
         grouped[userId] = {
-          user: serializeAuthUser(domain.user),
+          user: serializeUser(domain.user),
           domains: [],
         };
       }

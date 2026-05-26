@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AdminSidebar } from './AdminSidebar';
 import { Menu } from 'lucide-react';
+import { AdminBackButton } from './AdminBackButton';
 import { useAuth } from '@/hooks/useAuth';
 
 /**
@@ -25,13 +26,18 @@ export function AdminLayout({ children }) {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Bar */}
         <div className="flex items-center justify-between border-b border-border bg-card px-6 py-4">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="inline-flex p-2 lg:hidden rounded-lg hover:bg-muted transition-colors"
-            aria-label="Toggle sidebar"
-          >
-            <Menu size={20} />
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="inline-flex p-2 lg:hidden rounded-lg hover:bg-muted transition-colors"
+              aria-label="Toggle sidebar"
+            >
+              <Menu size={20} />
+            </button>
+
+            <AdminBackButton />
+          </div>
+
           <div className="text-sm text-muted-foreground">
             Signed in as <span className="font-medium text-foreground">{displayName}</span>
           </div>

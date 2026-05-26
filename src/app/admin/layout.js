@@ -1,14 +1,14 @@
-import { AdminLayout as AdminLayoutUI } from "@/components/admin/AdminLayout";
-import { requireAdminServer } from "@/lib/auth";
+"use client";
 
-export default async function AdminLayout({ children }) {
-  const auth = await requireAdminServer();
+import { usePathname } from "next/navigation";
+import { AdminLayout as AdminShell } from "@/components/admin/AdminLayout";
 
-  // If authenticated as admin, wrap in the admin UI with sidebar
-  if (auth.isAuthenticated && auth.isAdmin) {
-    return <AdminLayoutUI>{children}</AdminLayoutUI>;
+export default function AdminRouteLayout({ children }) {
+  const pathname = usePathname();
+
+  if (pathname === "/admin") {
+    return children;
   }
 
-  // Otherwise (e.g. login page), just return children
-  return <>{children}</>;
+  return <AdminShell>{children}</AdminShell>;
 }

@@ -15,7 +15,6 @@ export default function AdminWatchlistsPage() {
   const [pagination, setPagination] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
     apiFetch(`/api/admin/watchlists?page=${page}&limit=20`)
       .then((data) => {
         setWatchlists(data.data);
@@ -47,7 +46,7 @@ export default function AdminWatchlistsPage() {
           </Card>
         ) : (
           watchlists.map((watchlist) => (
-            <Card key={watchlist.user._id} className="p-6">
+            <Card key={String(watchlist.user._id)} className="p-6">
               <div className="flex items-start justify-between gap-4 mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-foreground">
@@ -92,7 +91,7 @@ export default function AdminWatchlistsPage() {
                   </thead>
                   <tbody>
                     {watchlist.domains.slice(0, 5).map((domain) => (
-                      <tr key={domain._id} className="border-b border-border/50">
+                      <tr key={String(domain._id)} className="border-b border-border/50">
                         <td className="px-4 py-2">
                           <span className="font-medium text-foreground">
                             {domain.domainName}

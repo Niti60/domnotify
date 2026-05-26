@@ -87,6 +87,9 @@ export async function middleware(req) {
           errorResponse.cookies.set({
             name: "token",
             value: "",
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
             maxAge: 0,
             path: "/",
           });
@@ -104,6 +107,9 @@ export async function middleware(req) {
         redirectResponse.cookies.set({
           name: "token",
           value: "",
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
           maxAge: 0,
           path: "/",
         });
@@ -135,6 +141,9 @@ export async function middleware(req) {
       redirectResponse.cookies.set({
         name: "token",
         value: "",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
         maxAge: 0,
         path: "/",
       });

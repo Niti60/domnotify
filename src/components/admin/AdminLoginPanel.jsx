@@ -36,7 +36,10 @@ export function AdminLoginPanel({ nextPath = '/admin/dashboard' }) {
         body: JSON.stringify({ email, password }),
       });
 
-      router.replace(destination);
+      // Force a full navigation so the browser includes the newly-set
+      // httpOnly cookie on the request. This avoids middleware seeing an
+      // unauthenticated request when the SPA navigates too quickly.
+      window.location.replace(destination);
     } catch (err) {
       setError(err.message || 'Admin authentication failed');
     } finally {
@@ -63,7 +66,7 @@ export function AdminLoginPanel({ nextPath = '/admin/dashboard' }) {
           <Input
             label="Admin email"
             type="email"
-            placeholder="email@admin.com"
+            placeholder="admin@domnotify.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required

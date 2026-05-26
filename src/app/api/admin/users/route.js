@@ -3,7 +3,7 @@ import User from "@/models/User";
 import { NextResponse } from "next/server";
 import { adminGuard, adminUnauthorized } from "@/middlewares/admin.middleware";
 import Domain from "@/models/Domain";
-import { serializeAuthUser } from "@/lib/serializers/user";
+import { serializeUser } from "@/lib/serializers/user";
 
 /**
  * GET /api/admin/users
@@ -27,8 +27,8 @@ export async function GET(req) {
     const filterPremium = searchParams.get("filterPremium");
     const filterRole = searchParams.get("filterRole");
 
-    // Build filter query - Exclude internal admins from customer table
-    const filter = { isAdmin: { $ne: true } };
+    // Build filter query
+    const filter = {};
 
     if (search) {
       filter.$or = [
@@ -63,7 +63,7 @@ export async function GET(req) {
           watchlist: true,
         });
         return {
-          ...serializeAuthUser(user),
+          ...serializeUser(user),
           watchlistCount,
         };
       })
@@ -141,7 +141,7 @@ export async function POST(req) {
       {
         success: true,
         message: "User created successfully",
-        user: serializeAuthUser(newUser),
+        user: serializeUser(newUser),
       },
       { status: 201 }
     );

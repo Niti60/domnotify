@@ -17,23 +17,33 @@ export default function AdminPremiumPage() {
   const [pagination, setPagination] = useState(null);
   const [editing, setEditing] = useState(null);
 
-  const loadPremiumUsers = async () => {
-    setLoading(true);
-    try {
-      const data = await apiFetch(`/api/admin/premium?page=${page}&limit=20`);
-      setPremiumUsers(data.data);
-      setPagination(data.pagination);
-      setStats(data.stats);
-    } catch (err) {
-      toast.error('Failed to load premium users');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadPremiumUsers();
+    let active = true;
+
+    (async () => {
+      try {
+        const data = await apiFetch(`/api/admin/premium?page=${page}&limit=20`);
+
+        if (!active) return;
+
+        setPremiumUsers(data.data);
+        setPagination(data.pagination);
+        setStats(data.stats);
+      } catch (err) {
+        if (!active) return;
+
+        toast.error('Failed to load premium users');
+        console.error(err);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
   }, [page]);
 
   const handleTogglePremium = async (userId, currentPremium) => {
@@ -54,6 +64,10 @@ export default function AdminPremiumPage() {
     }
   };
 
+      const data = await apiFetch(`/api/admin/premium?page=${page}&limit=20`);
+      setPremiumUsers(data.data);
+      setPagination(data.pagination);
+      setStats(data.stats);
   const handleChangePlan = async (userId, newPlan) => {
     try {
       await apiFetch('/api/admin/premium', {
@@ -92,7 +106,7 @@ export default function AdminPremiumPage() {
 
           {stats.planBreakdown && stats.planBreakdown.length > 0 && (
             stats.planBreakdown.map((plan) => (
-              <Card key={plan._id} className="p-6 space-y-2">
+              <Card key={String(plan._id)} className="p-6 space-y-2">
                 <p className="text-sm font-medium text-muted-foreground capitalize">
                   {plan._id || 'Unknown'} Plan
                 </p>
@@ -153,7 +167,7 @@ export default function AdminPremiumPage() {
               ) : (
                 premiumUsers.map((user) => (
                   <tr
-                    key={user._id}
+                    key={String(user._id)}
                     className="border-b border-border hover:bg-muted/30 transition-colors"
                   >
                     <td className="px-6 py-4">

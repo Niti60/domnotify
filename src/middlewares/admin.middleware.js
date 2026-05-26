@@ -24,7 +24,10 @@ export async function adminGuard(req) {
   try {
     const token = req.cookies.get("token")?.value;
 
+    console.log(`[Admin Guard] Token check - token exists: ${Boolean(token)}`);
+
     if (!token) {
+      console.log(`[Admin Guard] No token found. Cookies available: ${Array.from(req.cookies).map(([k]) => k).join(', ') || 'none'}`);
       return {
         isAuthorized: false,
         user: null,
@@ -35,7 +38,9 @@ export async function adminGuard(req) {
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log(`[Admin Guard] Token verified for user: ${decoded.id}`);
     } catch (err) {
+      console.error(`[Admin Guard] Token verification failed: ${err.message}`);
       return {
         isAuthorized: false,
         user: null,
@@ -48,6 +53,7 @@ export async function adminGuard(req) {
     const user = await User.findById(decoded.id).select("-password").lean();
 
     if (!user) {
+      console.error(`[Admin Guard] User not found: ${decoded.id}`);
       return {
         isAuthorized: false,
         user: null,
@@ -55,7 +61,10 @@ export async function adminGuard(req) {
       };
     }
 
+    console.log(`[Admin Guard] User found: ${user.email}, isAdmin: ${user.isAdmin}`);
+
     if (!user.isAdmin) {
+      console.error(`[Admin Guard] User is not admin: ${user.email}`);
       return {
         isAuthorized: false,
         user: serializeAuthUser(user),
@@ -63,6 +72,7 @@ export async function adminGuard(req) {
       };
     }
 
+    console.log(`[Admin Guard] Authorization successful for ${user.email}`);
     return {
       isAuthorized: true,
       user: serializeAuthUser(user),

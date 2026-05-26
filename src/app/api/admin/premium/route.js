@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { NextResponse } from "next/server";
 import { adminGuard, adminUnauthorized } from "@/middlewares/admin.middleware";
-import { serializeAuthUser } from "@/lib/serializers/user";
+import { serializeUser } from "@/lib/serializers/user";
 
 /**
  * GET /api/admin/premium
@@ -23,8 +23,8 @@ export async function GET(req) {
     const limit = Math.min(100, parseInt(searchParams.get("limit")) || 20);
     const plan = searchParams.get("plan"); // filter by plan
 
-    // Build filter - Exclude admins
-    const filter = { isPremiumUser: true, isAdmin: { $ne: true } };
+    // Build filter
+    const filter = { isPremiumUser: true };
     if (plan) {
       filter.premiumPlanType = plan;
     }
@@ -38,10 +38,10 @@ export async function GET(req) {
       .limit(limit)
       .lean();
 
-    // Get stats (excluding admins)
-    const allPremiumUsers = await User.countDocuments({ isPremiumUser: true, isAdmin: { $ne: true } });
+    // Get stats
+    const allPremiumUsers = await User.countDocuments({ isPremiumUser: true });
     const planStats = await User.aggregate([
-      { $match: { isPremiumUser: true, isAdmin: { $ne: true } } },
+      { $match: { isPremiumUser: true } },
       {
         $group: {
           _id: "$premiumPlanType",
@@ -53,7 +53,7 @@ export async function GET(req) {
     return NextResponse.json(
       {
         success: true,
-        data: premiumUsers.map((user) => serializeAuthUser(user)),
+        data: premiumUsers.map((user) => serializeUser(user)),
         stats: {
           totalPremiumUsers: allPremiumUsers,
           planBreakdown: planStats,
@@ -123,7 +123,7 @@ export async function PATCH(req) {
       {
         success: true,
         message: "Premium status updated",
-        user: serializeAuthUser(user),
+        user: serializeUser(user),
       },
       { status: 200 }
     );

@@ -3,7 +3,7 @@ import User from "@/models/User";
 import SearchHistory from "@/models/SearchHistory";
 import { NextResponse } from "next/server";
 import { adminGuard, adminUnauthorized } from "@/middlewares/admin.middleware";
-import { serializeAuthUser } from "@/lib/serializers/user";
+import { serializeUser } from "@/lib/serializers/user";
 
 /**
  * GET /api/admin/activity
@@ -35,11 +35,20 @@ export async function GET(req) {
         .limit(limit)
         .lean();
 
+      const serializedSearches = searches.map((entry) => ({
+        ...entry,
+        _id: entry._id?.toString?.() ?? String(entry._id),
+        user: serializeUser(entry.user),
+        searchedAt: entry.searchedAt ? new Date(entry.searchedAt).toISOString() : null,
+        createdAt: entry.createdAt ? new Date(entry.createdAt).toISOString() : undefined,
+        updatedAt: entry.updatedAt ? new Date(entry.updatedAt).toISOString() : undefined,
+      }));
+
       return NextResponse.json(
         {
           success: true,
           activityType: "search",
-          data: searches,
+          data: serializedSearches,
           pagination: {
             total,
             page,
@@ -50,21 +59,21 @@ export async function GET(req) {
         { status: 200 }
       );
     } else {
-      // Get latest login activity (excluding admins)
-      const users = await User.find({ lastLogin: { $ne: null }, isAdmin: { $ne: true } })
+      // Get latest login activity
+      const users = await User.find({ lastLogin: { $ne: null } })
         .select("name email role isPremiumUser lastLogin createdAt")
         .sort({ lastLogin: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .lean();
 
-      const total = await User.countDocuments({ lastLogin: { $ne: null }, isAdmin: { $ne: true } });
+      const total = await User.countDocuments({ lastLogin: { $ne: null } });
 
       return NextResponse.json(
         {
           success: true,
           activityType: "login",
-          data: users.map((user) => serializeAuthUser(user)),
+          data: users.map((user) => serializeUser(user)),
           pagination: {
             total,
             page,

@@ -10,7 +10,9 @@ function getSafeAdminNextPath(nextPath) {
   return nextPath;
 }
 
-export default async function AdminEntryPage({ searchParams }) {
+export default async function AdminEntryPage(props) {
+  const searchParams = await props.searchParams;
+
   const auth = await requireAuthServer();
   const nextPath = getSafeAdminNextPath(searchParams?.next);
 

@@ -65,19 +65,27 @@ export function serializeUser(user) {
 }
 
 export function serializeAuthUser(user) {
-  const serialized = serializeUser(user);
+  if (!user) return null;
 
-  if (!serialized) return null;
+  // Ensure we have a plain object with user properties
+  const plainUser = isPlainObject(user) ? user : (user.toObject?.() ?? user);
+  
+  // For Mongoose documents, directly access fields
+  const name = plainUser.name || user.name || null;
+  const email = plainUser.email || user.email || null;
+  const _id = plainUser._id?.toString?.() ?? plainUser._id ?? user._id?.toString?.() ?? user._id ?? null;
+  const role = plainUser.role || user.role || null;
+  const isAdmin = Boolean(plainUser.isAdmin ?? user.isAdmin);
+  const isPremiumUser = Boolean(plainUser.isPremiumUser ?? user.isPremiumUser);
+  const premiumPlanType = plainUser.premiumPlanType ?? user.premiumPlanType ?? null;
 
   return {
-    _id: serialized._id ?? null,
-    name: serialized.name ?? null,
-    email: serialized.email ?? null,
-    role: serialized.role ?? null,
-    isAdmin: Boolean(serialized.isAdmin),
-    isPremiumUser: Boolean(serialized.isPremiumUser),
-    premiumPlanType: serialized.premiumPlanType ?? null,
-    createdAt: serialized.createdAt ?? null,
-    lastLogin: serialized.lastLogin ?? null,
+    _id,
+    name,
+    email,
+    role,
+    isAdmin,
+    isPremiumUser,
+    premiumPlanType,
   };
 }
