@@ -192,9 +192,9 @@ export default function AdminUsersPage() {
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+                users.map((user, index) => (
                   <tr
-                      key={String(user._id)}
+                    key={user._id?.toString?.() || user.id || user.email || index}
                     className="border-b border-border hover:bg-muted/30 transition-colors"
                   >
                     <td className="px-6 py-4">
@@ -224,15 +224,15 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                       <span suppressHydrationWarning>
-                          {user.createdAt ? (
-                            new Date(user.createdAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })
-                          ) : (
-                            '—'
-                          )}
+                        {user.createdAt ? (
+                          new Date(user.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })
+                        ) : (
+                          '—'
+                        )}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">

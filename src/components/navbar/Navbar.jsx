@@ -19,11 +19,19 @@ const navItems = [
 
 export function Navbar({ onMenuClick }) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const router = useRouter();
 
   const isActive = (href) => {
     if (href === '/dashboard' && pathname === '/') return true;
     return pathname.startsWith(href);
   };
+
+  // Filter items based on auth state
+  const visibleNavItems = navItems.filter(item => {
+    if (!user && (item.href === '/dashboard' || item.href === '/monitoring')) return false;
+    return true;
+  });
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background transition-colors duration-200">
@@ -36,11 +44,11 @@ export function Navbar({ onMenuClick }) {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <Logo priority className="" />
+          <Logo priority className="cursor-pointer" onClick={() => router.push(user ? '/dashboard' : '/')} />
         </div>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}

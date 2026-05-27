@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -17,34 +17,24 @@ export default function AdminPremiumPage() {
   const [pagination, setPagination] = useState(null);
   const [editing, setEditing] = useState(null);
 
-  useEffect(() => {
-    let active = true;
-
-    (async () => {
-      try {
-        const data = await apiFetch(`/api/admin/premium?page=${page}&limit=20`);
-
-        if (!active) return;
-
-        setPremiumUsers(data.data);
-        setPagination(data.pagination);
-        setStats(data.stats);
-      } catch (err) {
-        if (!active) return;
-
-        toast.error('Failed to load premium users');
-        console.error(err);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
+  const loadPremiumUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiFetch(`/api/admin/premium?page=${page}&limit=20`);
+      setPremiumUsers(data.data || []);
+      setPagination(data.pagination);
+      setStats(data.stats);
+    } catch (err) {
+      toast.error('Failed to load premium users');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, [page]);
+
+  useEffect(() => {
+    loadPremiumUsers();
+  }, [loadPremiumUsers]);
 
   const handleTogglePremium = async (userId, currentPremium) => {
     try {
@@ -64,10 +54,6 @@ export default function AdminPremiumPage() {
     }
   };
 
-      const data = await apiFetch(`/api/admin/premium?page=${page}&limit=20`);
-      setPremiumUsers(data.data);
-      setPagination(data.pagination);
-      setStats(data.stats);
   const handleChangePlan = async (userId, newPlan) => {
     try {
       await apiFetch('/api/admin/premium', {
@@ -103,116 +89,131 @@ export default function AdminPremiumPage() {
               {stats.totalPremiumUsers}
             </p>
           </Card>
-
-          {stats.planBreakdown && stats.planBreakdown.length > 0 && (
-            stats.planBreakdown.map((plan) => (
-              <Card key={String(plan._id)} className="p-6 space-y-2">
-                <p className="text-sm font-medium text-muted-foreground capitalize">
-                  {plan._id || 'Unknown'} Plan
-                </p>
-                <p className="text-3xl font-bold text-foreground">
-                  {plan.count}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {(
-                    (plan.count / (stats.totalPremiumUsers || 1)) *
-                    100
-                  ).toFixed(1)}
-                  % of premium
-                </p>
-              </Card>
-            ))
-          )}
+          <Card className="p-6 space-y-2">
+            <p className="text-sm font-medium text-muted-foreground">
+              Active Plans
+            </p>
+            <div className="flex gap-2">
+              <Badge variant="success">Pro: {stats.planCounts?.pro || 0}</Badge>
+              <Badge variant="warning">Business: {stats.planCounts?.business || 0}</Badge>
+            </div>
+          </Card>
+          <Card className="p-6 space-y-2 text-primary">
+            <div className="flex items-center gap-2">
+              <Crown className="h-4 w-4" />
+              <p className="text-sm font-medium">Conversion Rate</p>
+            </div>
+            <p className="text-3xl font-bold">{stats.conversionRate}%</p>
+          </Card>
         </div>
       )}
 
-      {/* Premium Users Table */}
+      {/* Users Table */}
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="border-b border-border bg-muted/50">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted/50">
               <tr>
-                <th className="px-6 py-3 text-left font-medium text-foreground">
+                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   User
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-foreground">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left font-medium text-foreground">
+                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Plan
                 </th>
-                <th className="px-6 py-3 text-left font-medium text-foreground">
-                  Subscriber Since
+                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Status
                 </th>
-                <th className="px-6 py-3 text-right font-medium text-foreground">
+                <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Join Date
+                </th>
+                <th className="px-6 py-4 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border bg-card">
               {loading ? (
-                <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center">
-                    <div className="flex justify-center">
-                      <div className="h-6 w-6 animate-spin rounded-full border-2 border-border border-t-foreground" />
-                    </div>
-                  </td>
-                </tr>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td colSpan={5} className="px-6 py-4">
+                      <div className="h-4 w-full rounded bg-muted/50" />
+                    </td>
+                  </tr>
+                ))
               ) : premiumUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-muted-foreground">
+                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                     No premium users found
                   </td>
                 </tr>
               ) : (
                 premiumUsers.map((user) => (
-                  <tr
-                    key={String(user._id)}
-                    className="border-b border-border hover:bg-muted/30 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <span className="font-medium text-foreground">
-                        {user.name}
-                      </span>
+                  <tr key={user._id} className="hover:bg-muted/30 transition-colors">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-foreground">{user.name}</span>
+                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-muted-foreground">
-                      {user.email}
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <Badge variant={user.premiumPlanType === 'business' ? 'warning' : 'success'}>
+                        {user.premiumPlanType}
+                      </Badge>
                     </td>
-                    <td className="px-6 py-4">
-                      <Badge variant="default">{user.premiumPlanType}</Badge>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <Badge variant="neutral">Active</Badge>
                     </td>
-                    <td className="px-6 py-4 text-muted-foreground">
-                      {new Date(user.updatedAt).toLocaleDateString()}
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
+                      {new Date(user.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      {editing === user._id ? (
-                        <div className="flex gap-2 justify-end">
-                          <select
-                            onChange={(e) =>
-                              handleChangePlan(user._id, e.target.value)
-                            }
-                            className="rounded border border-border bg-background px-2 py-1 text-xs"
-                          >
-                            <option value="">Select plan...</option>
-                            <option value="pro">Pro</option>
-                            <option value="ultra">Ultra</option>
-                            <option value="enterprise">Enterprise</option>
-                          </select>
-                          <button
-                            onClick={() => setEditing(null)}
-                            className="px-2 py-1 text-xs rounded border border-border hover:bg-muted"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button
+                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => setEditing(user._id)}
-                          className="px-3 py-1.5 text-xs font-medium rounded text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
                         >
-                          <Crown size={14} className="inline mr-1" />
-                          Edit
-                        </button>
+                          Modify
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => handleTogglePremium(user._id, true)}
+                        >
+                          Revoke
+                        </Button>
+                      </div>
+
+                      {editing === user._id && (
+                        <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md border border-border bg-card p-2 shadow-lg ring-1 ring-black ring-opacity-5">
+                          <div className="grid gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="justify-start"
+                              onClick={() => handleChangePlan(user._id, 'pro')}
+                            >
+                              Upgrade to Pro
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="justify-start"
+                              onClick={() => handleChangePlan(user._id, 'business')}
+                            >
+                              Upgrade to Business
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="justify-start text-destructive"
+                              onClick={() => setEditing(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -224,25 +225,27 @@ export default function AdminPremiumPage() {
 
         {/* Pagination */}
         {pagination && pagination.pages > 1 && (
-          <div className="flex items-center justify-between border-t border-border px-6 py-4">
-            <span className="text-sm text-muted-foreground">
-              Page {pagination.page} of {pagination.pages}
-            </span>
+          <div className="flex items-center justify-between border-t border-border bg-muted/30 px-6 py-4">
+            <p className="text-sm text-muted-foreground">
+              Showing page {page} of {pagination.pages}
+            </p>
             <div className="flex gap-2">
-              <button
-                onClick={() => setPage(Math.max(1, page - 1))}
+              <Button
+                variant="outline"
+                size="sm"
                 disabled={page === 1}
-                className="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 transition-colors text-sm font-medium"
+                onClick={() => setPage(page - 1)}
               >
                 Previous
-              </button>
-              <button
-                onClick={() => setPage(Math.min(pagination.pages, page + 1))}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 disabled={page === pagination.pages}
-                className="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 transition-colors text-sm font-medium"
+                onClick={() => setPage(page + 1)}
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
         )}

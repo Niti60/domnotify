@@ -3,9 +3,12 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { toast } from 'sonner';
+
 const AuthContext = createContext({
   user: null,
   loading: false,
+  setUser: () => { },
   refreshUser: async () => { },
   logout: async () => { }
 });
@@ -27,7 +30,13 @@ export function AuthProvider({ children, initialUser = null }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Sync state with server-provided initial user
+  React.useEffect(() => {
+    setUser(initialUser);
+  }, [initialUser]);
+
   const refreshUser = async () => {
+    setLoading(true);
     try {
       const controller = new AbortController();
       // Timeout after 5 seconds to avoid hanging
@@ -50,19 +59,23 @@ export function AuthProvider({ children, initialUser = null }) {
     } catch (err) {
       console.error("[Auth] Initialization error:", err);
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { 
+      await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include',
       });
       // Also clear any legacy localStorage tokens
       localStorage.removeItem('token');
+      toast.success('Logged out successfully');
     } catch (err) {
       console.error("[Auth] Logout error:", err);
+      toast.error('Logout failed. Please try again.');
     }
     setUser(null);
     router.push('/auth');

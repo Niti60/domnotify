@@ -29,7 +29,7 @@ export async function POST(req) {
     if (!user) {
       console.error(`[Admin Login] User not found for email: ${email}`);
       return NextResponse.json(
-        { success: false, message: 'Invalid admin credentials' },
+        { success: false, message: 'Incorrect email or password.' },
         { status: 401 }
       );
     }
@@ -39,16 +39,13 @@ export async function POST(req) {
     if (!user.isAdmin) {
       console.error(`[Admin Login] User ${user._id} is not an admin. isAdmin=${user.isAdmin}`);
       return NextResponse.json(
-        { success: false, message: 'Admin access required' },
+        { success: false, message: 'You do not have permission to access the admin area.' },
         { status: 403 }
       );
     }
 
     // Verify password with detailed logging
     console.log(`[Admin Login] Comparing password for user ${user._id}`);
-    console.log(`[Admin Login] Password hash exists: ${Boolean(user.password)}`);
-    console.log(`[Admin Login] Entered password length: ${password.length}`);
-    console.log(`[Admin Login] Stored hash length: ${user.password?.length || 0}`);
 
     let isMatch = false;
     try {
@@ -57,7 +54,7 @@ export async function POST(req) {
     } catch (bcryptError) {
       console.error(`[Admin Login] bcrypt.compare() error:`, bcryptError.message);
       return NextResponse.json(
-        { success: false, message: 'Authentication error' },
+        { success: false, message: 'Something went wrong. Please try again.' },
         { status: 500 }
       );
     }
@@ -65,7 +62,7 @@ export async function POST(req) {
     if (!isMatch) {
       console.error(`[Admin Login] Password mismatch for user ${user._id}`);
       return NextResponse.json(
-        { success: false, message: 'Invalid admin credentials' },
+        { success: false, message: 'Incorrect email or password.' },
         { status: 401 }
       );
     }
@@ -76,8 +73,6 @@ export async function POST(req) {
     await user.save();
 
     const token = generateToken(user);
-
-    console.log(`[Admin Login] JWT token generated for ${user._id}`);
 
     const response = NextResponse.json(
       {
@@ -99,13 +94,11 @@ export async function POST(req) {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    console.log(`[Admin Login] Login completed, redirecting to admin dashboard`);
-
     return response;
   } catch (error) {
     console.error('[Admin Login] Unexpected error:', error);
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      { success: false, message: 'Something went wrong. Please try again.' },
       { status: 500 }
     );
   }

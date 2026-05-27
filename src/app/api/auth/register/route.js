@@ -48,8 +48,11 @@ export async function POST(req) {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { success: false, message: "User already exists" },
-        { status: 400 }
+        {
+          success: false,
+          message: "An account already exists with this email. Try signing in instead."
+        },
+        { status: 409 }
       );
     }
 
@@ -81,18 +84,24 @@ export async function POST(req) {
     response.cookies.set({
       name: "token",
       value: token,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return response;
   } catch (error) {
+    // Internally log the full error
     console.error("Register Error:", error);
+
+    // Return a calm, professional error message to the user
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
+      {
+        success: false,
+        message: "Something went wrong. Please try again."
+      },
       { status: 500 }
     );
   }

@@ -42,8 +42,8 @@ export default function AdminActivityPage() {
               setPage(1);
             }}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${activityType === 'login'
-                ? 'bg-foreground text-background'
-                : 'border border-border hover:bg-muted'
+              ? 'bg-foreground text-background'
+              : 'border border-border hover:bg-muted'
               }`}
           >
             <LogIn size={16} className="inline mr-2" />
@@ -55,8 +55,8 @@ export default function AdminActivityPage() {
               setPage(1);
             }}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${activityType === 'search'
-                ? 'bg-foreground text-background'
-                : 'border border-border hover:bg-muted'
+              ? 'bg-foreground text-background'
+              : 'border border-border hover:bg-muted'
               }`}
           >
             <Search size={16} className="inline mr-2" />
@@ -104,34 +104,38 @@ export default function AdminActivityPage() {
                   </td>
                 </tr>
               ) : (
-                activity.map((item) => (
+                activity.map((log, index) => (
                   <tr
-                    key={String(item._id)}
+                    key={
+                      log._id?.toString?.() ||
+                      log.id ||
+                      `${log.email || log.user?.email || 'anon'}-${log.timestamp || log.searchedAt || log.lastLogin || index}-${index}`
+                    }
                     className="border-b border-border hover:bg-muted/30 transition-colors"
                   >
                     <td className="px-6 py-4">
                       <span className="font-medium text-foreground">
-                        {item.user?.name || item.name}
+                        {log.user?.name || log.name}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
-                      {item.user?.email || item.email}
+                      {log.user?.email || log.email}
                     </td>
                     <td className="px-6 py-4">
                       {activityType === 'login' ? (
-                        item.lastLogin ? (
-                          new Date(item.lastLogin).toLocaleString()
+                        log.lastLogin ? (
+                          new Date(log.lastLogin).toLocaleString()
                         ) : (
                           <span className="text-muted-foreground">Never</span>
                         )
                       ) : (
                         <span className="font-mono text-xs text-muted-foreground">
-                          {item.query}
+                          {log.query}
                         </span>
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      {item.isPremiumUser ? (
+                      {log.isPremiumUser ? (
                         <Badge variant="default">Premium</Badge>
                       ) : (
                         <span className="text-xs text-muted-foreground">
@@ -141,10 +145,10 @@ export default function AdminActivityPage() {
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
                       {activityType === 'login'
-                        ? item.lastLogin
-                          ? new Date(item.lastLogin).toLocaleDateString()
+                        ? log.lastLogin
+                          ? new Date(log.lastLogin).toLocaleDateString()
                           : '—'
-                        : new Date(item.searchedAt).toLocaleString()}
+                        : new Date(log.searchedAt).toLocaleString()}
                     </td>
                   </tr>
                 ))

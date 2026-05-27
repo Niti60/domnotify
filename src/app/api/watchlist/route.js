@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { ensureDb } from '@/lib/domainService';
+import {
+  ensureDb,
+  syncDomainWhois,
+  checkDomainSSL
+} from '@/lib/domainService';
 import { computeDomainStatus, parseRenewalPrice, serializeDomain } from '@/lib/domainHelpers';
 import Domain from '@/models/Domain';
 
@@ -66,6 +70,12 @@ export async function POST(req) {
       existing.lastChecked = new Date();
       await existing.save();
 
+      // Enrich data if missing
+      if (existing.registrar === 'Unknown' || !existing.expiryDate) {
+        await syncDomainWhois(existing);
+      }
+      await checkDomainSSL(existing);
+
       return NextResponse.json({
         success: true,
         domain: serializeDomain(existing),
@@ -84,6 +94,10 @@ export async function POST(req) {
       status: computeDomainStatus(expiryDate),
       lastChecked: new Date(),
     });
+
+    // Automatic enrichment
+    await syncDomainWhois(domain);
+    await checkDomainSSL(domain);
 
     return NextResponse.json(
       { success: true, domain: serializeDomain(domain), message: 'Domain added to watchlist' },

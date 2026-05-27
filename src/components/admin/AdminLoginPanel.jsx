@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, ShieldAlert } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -36,6 +37,7 @@ export function AdminLoginPanel({ nextPath = '/admin/dashboard' }) {
         body: JSON.stringify({ email, password }),
       });
 
+      toast.success('Admin access granted. Welcome to the Control Center.');
       // Force a full navigation so the browser includes the newly-set
       // httpOnly cookie on the request. This avoids middleware seeing an
       // unauthenticated request when the SPA navigates too quickly.

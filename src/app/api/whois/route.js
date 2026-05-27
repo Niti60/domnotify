@@ -13,10 +13,19 @@ export async function GET(req) {
 
         const { searchParams } = new URL(req.url);
         const domain = searchParams.get('domain')?.trim().toLowerCase();
+        console.log(`[WHOIS API] Looking up: ${domain}`);
 
         if (!domain) {
             return NextResponse.json(
                 { success: false, message: 'Domain is required' },
+                { status: 400 },
+            );
+        }
+
+        // Basic validation: must have at least one dot to be a valid domain
+        if (!domain.includes('.') && domain !== 'localhost') {
+            return NextResponse.json(
+                { success: false, message: 'Please provide a valid domain name (e.g., google.com)' },
                 { status: 400 },
             );
         }

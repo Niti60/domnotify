@@ -30,7 +30,7 @@ export async function POST(req) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid credentials",
+          message: "Incorrect email or password.",
         },
         { status: 401 }
       );
@@ -45,7 +45,7 @@ export async function POST(req) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid credentials",
+          message: "Incorrect email or password.",
         },
         { status: 401 }
       );
@@ -79,12 +79,13 @@ export async function POST(req) {
 
     return response;
   } catch (error) {
+    // Internally log full details
     console.error("Login Error:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Internal server error",
+        message: "Something went wrong. Please try again.",
       },
       { status: 500 }
     );

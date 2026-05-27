@@ -31,7 +31,7 @@ export async function GET(req) {
 
     if (!user) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
+        { success: false, message: "Account not found." },
         { status: 404 }
       );
     }
@@ -44,9 +44,11 @@ export async function GET(req) {
       { status: 200 }
     );
   } catch (error) {
+    // Internally log the error
     console.error("Auth Me Error:", error);
+
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
+      { success: false, message: "Something went wrong. Please try again." },
       { status: 500 }
     );
   }

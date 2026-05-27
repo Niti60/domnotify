@@ -45,6 +45,19 @@ export function parseRenewalPrice(price) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
+export function calculateDomainAge(createdDate) {
+  if (!createdDate) return null;
+  const created = new Date(createdDate);
+  if (isNaN(created.getTime())) return null;
+  const now = new Date();
+  const diffTime = Math.abs(now - created);
+  const diffYears = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
+  const diffDays = Math.floor((diffTime % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24));
+
+  if (diffYears > 0) return `${diffYears}y ${diffDays}d`;
+  return `${diffDays}d`;
+}
+
 export function formatRelativeTime(date) {
   if (!date) return 'Never';
   const then = new Date(date).getTime();
@@ -68,28 +81,36 @@ export function serializeDomain(domain) {
   const status = obj.status || computeDomainStatus(obj.expiryDate);
   const sslStatus = obj.sslStatus || computeSslStatus(obj.sslValidTo);
 
+  const getCleanVal = (val, fallback = 'Unknown') => {
+    if (!val) return fallback;
+    if (typeof val === 'object') {
+      return val.name || val.id || val.organization || val.O || fallback;
+    }
+    return String(val);
+  };
+
   return {
     _id: obj._id?.toString(),
     domain: obj.domainName,
     domainName: obj.domainName,
-    registrar: obj.registrar || 'Unknown',
+    registrar: getCleanVal(obj.registrar),
     domainExpiresAt: formatDate(obj.expiryDate),
     sslExpiresAt: formatDate(obj.sslValidTo),
     expiryDate: obj.expiryDate,
     daysLeft,
     renewal: formatRenewalPrice(obj.renewalPrice),
     renewalPrice: obj.renewalPrice,
-    status,
+    status: getCleanVal(status, 'Active'),
     lastChecked: formatRelativeTime(obj.lastChecked),
-    sslIssuer: obj.sslIssuer || 'Unknown',
+    sslIssuer: getCleanVal(obj.sslIssuer),
     sslValidFromAt: obj.sslValidFrom ? formatDate(obj.sslValidFrom) : 'Unavailable',
     sslValidToAt: obj.sslValidTo ? formatDate(obj.sslValidTo) : 'Unavailable',
-    sslStatus,
+    sslStatus: getCleanVal(sslStatus, 'Unknown'),
     sslDaysLeft: getDaysLeft(obj.sslValidTo),
-    sslSerialNumber: obj.sslSerialNumber || 'Unavailable',
-    sslEncryption: obj.sslEncryption || 'Unavailable',
-    sslChainStatus: obj.sslChainStatus || 'Unavailable',
-    nameservers: obj.nameservers || [],
+    sslSerialNumber: getCleanVal(obj.sslSerialNumber, 'Unavailable'),
+    sslEncryption: getCleanVal(obj.sslEncryption, 'Unavailable'),
+    sslChainStatus: getCleanVal(obj.sslChainStatus, 'Unavailable'),
+    nameservers: Array.isArray(obj.nameservers) ? obj.nameservers.map(ns => getCleanVal(ns)) : [],
     autoRenew: obj.autoRenew ?? false,
     watchlist: obj.watchlist ?? false,
     createdAt: obj.createdAt,

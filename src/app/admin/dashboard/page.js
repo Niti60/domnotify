@@ -77,9 +77,9 @@ export default function AdminDashboardPage() {
             Premium Plan Breakdown
           </h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.premiumBreakdown.map((plan) => (
+            {stats.premiumBreakdown.map((plan, index) => (
               <div
-                key={String(plan._id)}
+                key={plan._id || index}
                 className="rounded-lg border border-border bg-card p-4"
               >
                 <p className="text-sm font-medium capitalize text-muted-foreground">

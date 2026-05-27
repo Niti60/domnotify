@@ -154,6 +154,7 @@ export default function WatchlistPage() {
                   <th className="px-4 py-3 font-semibold">Domain</th>
                   <th className="px-4 py-3 font-semibold">Registrar</th>
                   <th className="px-4 py-3 font-semibold">Expiry date</th>
+                  <th className="px-4 py-3 font-semibold">SSL Status</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
                   <th className="px-4 py-3 font-semibold">Action</th>
                 </tr>
@@ -163,7 +164,7 @@ export default function WatchlistPage() {
                   const expired = row.status === 'Expired';
                   return (
                     <tr
-                      key={row._id}
+                      key={row._id || row.domain}
                       className="transition-colors duration-200 hover:bg-black/5 dark:hover:bg-white/5"
                     >
                       <td className="px-4 py-4 font-medium text-foreground">{row.domain}</td>
@@ -177,6 +178,13 @@ export default function WatchlistPage() {
                             </span>
                           )}
                         </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <StatusBadge
+                          variant={row.sslStatus === 'Valid' ? 'success' : row.sslStatus === 'Renew soon' ? 'warning' : row.sslStatus === 'Expired' ? 'destructive' : 'neutral'}
+                        >
+                          {row.sslStatus}
+                        </StatusBadge>
                       </td>
                       <td className="px-4 py-4">
                         <StatusBadge variant={statusToVariant(row.status)}>{row.status}</StatusBadge>

@@ -11,7 +11,31 @@ import {
   parseRenewalPrice,
   serializeDomain,
 } from '@/lib/domainHelpers';
-import { getDomainAvailability, getSSLCertificate } from '@/lib/whoisService';
+import { getDomainAvailability, getSSLCertificate, getWhoisData } from '@/lib/whoisService';
+
+export async function syncDomainWhois(domain) {
+  try {
+    const whois = await getWhoisData(domain.domainName).catch(() => null);
+    if (whois) {
+      if (whois.registrar && whois.registrar !== 'N/A') {
+        domain.registrar = whois.registrar;
+      }
+      if (whois.expiration_date) {
+        domain.expiryDate = new Date(whois.expiration_date);
+        domain.status = computeDomainStatus(domain.expiryDate);
+      }
+      if (whois.name_servers) {
+        domain.nameservers = whois.name_servers;
+      }
+      domain.lastChecked = new Date();
+      await domain.save();
+    }
+    return domain;
+  } catch (err) {
+    console.error(`WHOIS sync failed for ${domain.domainName}:`, err.message);
+    return domain;
+  }
+}
 
 export async function getUserDomains(userId, filter = {}) {
   return Domain.find({ user: userId, ...filter }).sort({ updatedAt: -1 }).lean();
@@ -64,13 +88,13 @@ export async function checkDomainSSL(domain) {
       if (whoisValidFrom) {
         try {
           domain.sslValidFrom = new Date(whoisValidFrom);
-        } catch (_) {}
+        } catch (_) { }
       }
 
       if (whoisValidTo) {
         try {
           domain.sslValidTo = new Date(whoisValidTo);
-        } catch (_) {}
+        } catch (_) { }
       }
 
       domain.sslSerialNumber = toSafeString(whoisCert.serial_number || whoisCert.serialNumber || whoisCert.serial, domain.sslSerialNumber);
@@ -270,11 +294,24 @@ export async function searchDomains(keyword) {
       const domain = `${base}${tld}`;
       const available = await checkDomainAvailability(domain);
       const price = TLD_PRICES[tld] || 12.99;
+
+      let registrar = available ? 'Namecheap' : 'Owned';
+      if (!available) {
+        try {
+          const whois = await getWhoisData(domain);
+          if (whois && whois.registrar && whois.registrar !== 'N/A') {
+            registrar = whois.registrar;
+          }
+        } catch (e) {
+          // ignore error, keep 'Owned'
+        }
+      }
+
       return {
         domain,
         available,
         price: available ? `$${price.toFixed(2)}/yr` : 'Taken',
-        registrar: available ? 'Namecheap' : 'Owned',
+        registrar,
       };
     }),
   );

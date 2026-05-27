@@ -122,6 +122,7 @@ export async function middleware(req) {
     if (!token) {
       const authUrl = new URL("/auth", req.url);
       authUrl.searchParams.set("next", requestedPath);
+      authUrl.searchParams.set("reason", "unauthorized");
       return NextResponse.redirect(authUrl, {
         status: 307,
       });
@@ -135,8 +136,9 @@ export async function middleware(req) {
       // Token verification failed (expired, invalid signature, etc.)
       const authUrl = new URL("/auth", req.url);
       authUrl.searchParams.set("next", requestedPath);
+      authUrl.searchParams.set("reason", "expired");
       const redirectResponse = NextResponse.redirect(authUrl, { status: 307 });
-      
+
       // Clear the invalid token from cookies
       redirectResponse.cookies.set({
         name: "token",
@@ -147,7 +149,7 @@ export async function middleware(req) {
         maxAge: 0,
         path: "/",
       });
-      
+
       return redirectResponse;
     }
   } catch (error) {

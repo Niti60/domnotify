@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { apiFetch } from '@/lib/apiClient';
+import { calculateDomainAge } from '@/lib/domainHelpers';
 
 export default function WhoisCheckerPage() {
   const searchParams = useSearchParams();
@@ -71,15 +72,25 @@ export default function WhoisCheckerPage() {
     }
   };
 
-  const whois = results?.whois?.whois || results?.whois || {};
-  const dnsRecords = results?.dns?.records || [];
-  const subdomains = results?.subdomains?.subdomains || [];
+  const whois = results?.whois || {};
+  const dnsRecords = results?.dns?.records || results?.dns || [];
+  const subdomains = results?.subdomains?.subdomains || results?.subdomains || [];
+
+  const safeValue = (val) => {
+    if (!val || val === 'N/A') return 'Unavailable';
+    if (typeof val === 'object') {
+      if (Array.isArray(val)) return val.length > 0 ? val.join(', ') : 'None';
+      return val.name || val.email || val.url || val.id || 'N/A';
+    }
+    return String(val);
+  };
 
   const mainStats = [
     ['Domain', whois.domain_name || domain],
-    ['Registrar', whois.registrar || 'N/A'],
-    ['Registered', formatDate(whois.created_date || whois.registration_date)],
-    ['Expires', formatDate(whois.expiration_date || whois.expiry_date)],
+    ['Registrar', safeValue(whois.registrar)],
+    ['Age', calculateDomainAge(whois.created_date) || 'New Domain'],
+    ['Registered', formatDate(whois.created_date)],
+    ['Expires', formatDate(whois.expiration_date)],
     ['Updated', formatDate(whois.updated_date)],
   ];
 
@@ -125,11 +136,11 @@ export default function WhoisCheckerPage() {
                 <Info className="h-4 w-4 text-blue-500" />
                 Registration Info
               </h3>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 {mainStats.map(([label, value]) => (
                   <div key={label}>
                     <p className="text-sm text-muted-foreground">{label}</p>
-                    <p className="mt-1 font-semibold text-foreground">{value}</p>
+                    <p className="mt-1 font-semibold text-foreground truncate max-w-full">{value}</p>
                   </div>
                 ))}
               </div>
@@ -144,22 +155,34 @@ export default function WhoisCheckerPage() {
                 <div>
                   <p className="text-sm text-muted-foreground">Registrant</p>
                   <p className="mt-1 font-semibold text-foreground">
-                    {whois.registrant_name || whois.registrant?.name || 'Private/Hidden'}
+                    {safeValue(whois.registrant_name)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Organization</p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {safeValue(whois.registrant_organization)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Country</p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {safeValue(whois.registrant_country)}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
                   <div className="mt-1 flex items-center gap-2">
                     <span className="truncate font-semibold text-foreground">
-                      {whois.registrant_email || whois.registrant?.email || 'N/A'}
+                      {safeValue(whois.registrant_email)}
                     </span>
-                    {(whois.registrant_email || whois.registrant?.email) && (
+                    {whois.registrant_email && whois.registrant_email !== 'N/A' && !whois.registrant_email.includes('Hidden') && (
                       <button
                         type="button"
-                        onClick={() => copyText(whois.registrant_email || whois.registrant?.email)}
+                        onClick={() => copyText(safeValue(whois.registrant_email))}
                         className="rounded-lg border border-border p-2 text-muted-foreground transition-colors duration-200 hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
                       >
-                        {copied === (whois.registrant_email || whois.registrant?.email) ? (
+                        {copied === safeValue(whois.registrant_email) ? (
                           <Check className="h-4 w-4 text-emerald-600" />
                         ) : (
                           <Copy className="h-4 w-4" />
@@ -174,12 +197,12 @@ export default function WhoisCheckerPage() {
                 <div className="mt-2 flex flex-wrap gap-2">
                   {Array.isArray(whois.status) ? (
                     whois.status.map((s) => (
-                      <Badge key={s} variant="success">
-                        {s}
+                      <Badge key={safeValue(s)} variant="success">
+                        {safeValue(s)}
                       </Badge>
                     ))
                   ) : (
-                    <Badge variant="success">{whois.status || 'Active'}</Badge>
+                    <Badge variant="success">{safeValue(whois.status) || 'Active'}</Badge>
                   )}
                 </div>
               </div>
@@ -193,25 +216,28 @@ export default function WhoisCheckerPage() {
               Nameservers
             </h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {(whois.name_servers || whois.nameservers || []).map((ns) => (
-                <div
-                  key={ns}
-                  className="flex items-center justify-between rounded-lg border border-border bg-muted/50 px-4 py-3"
-                >
-                  <span className="font-mono text-xs text-foreground truncate">{ns}</span>
-                  <button
-                    type="button"
-                    onClick={() => copyText(ns)}
-                    className="ml-2 rounded-lg p-1.5 text-muted-foreground transition-colors duration-200 hover:bg-black/10 hover:text-foreground dark:hover:bg-white/10"
+              {(whois.name_servers || whois.nameservers || []).map((ns, idx) => {
+                const val = safeValue(ns);
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between rounded-lg border border-border bg-muted/50 px-4 py-3"
                   >
-                    {copied === ns ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )}
-                  </button>
-                </div>
-              ))}
+                    <span className="font-mono text-xs text-foreground truncate">{val}</span>
+                    <button
+                      type="button"
+                      onClick={() => copyText(val)}
+                      className="ml-2 rounded-lg p-1.5 text-muted-foreground transition-colors duration-200 hover:bg-black/10 hover:text-foreground dark:hover:bg-white/10"
+                    >
+                      {copied === val ? (
+                        <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5" />
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </Card>
 

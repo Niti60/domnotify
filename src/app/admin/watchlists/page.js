@@ -45,8 +45,8 @@ export default function AdminWatchlistsPage() {
             No watchlists found
           </Card>
         ) : (
-          watchlists.map((watchlist) => (
-            <Card key={String(watchlist.user._id)} className="p-6">
+          watchlists.map((watchlist, index) => (
+            <Card key={watchlist.user?._id?.toString?.() || watchlist.user?.id || `watchlist-${index}`} className="p-6">
               <div className="flex items-start justify-between gap-4 mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-foreground">
@@ -90,8 +90,8 @@ export default function AdminWatchlistsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {watchlist.domains.slice(0, 5).map((domain) => (
-                      <tr key={String(domain._id)} className="border-b border-border/50">
+                    {watchlist.domains.slice(0, 5).map((domain, dIndex) => (
+                      <tr key={domain._id?.toString?.() || domain.id || `domain-${dIndex}`} className="border-b border-border/50">
                         <td className="px-4 py-2">
                           <span className="font-medium text-foreground">
                             {domain.domainName}

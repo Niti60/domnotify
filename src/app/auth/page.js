@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -17,8 +17,11 @@ import {
   Briefcase,
   Eye,
   EyeOff,
-  ChevronRight
+  ChevronRight,
+  CheckCircle2
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 import { Logo } from '../../components/ui/Logo';
 import { cn } from '@/lib/cn';
 
@@ -94,6 +97,7 @@ function AuthInput({ label, icon: Icon, error, ...props }) {
 function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setUser } = useAuth();
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
   const [apiError, setApiError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -116,6 +120,20 @@ function AuthPageContent() {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' }
   });
+
+  // Handle redirection messages
+  useEffect(() => {
+    const reason = searchParams.get('reason');
+    if (reason === 'expired') {
+      setApiError('Your session has expired. Please sign in again.');
+      toast.info('Session expired', { description: 'Please log in to continue.' });
+    } else if (reason === 'unauthorized') {
+      setApiError('Please sign in to access this page.');
+    } else if (reason === 'logout/') {
+      // Just in case logout redirects here
+      toast.success('You have been logged out.');
+    }
+  }, [searchParams]);
 
   const {
     register: registerRegister,
@@ -147,21 +165,38 @@ function AuthPageContent() {
         body: JSON.stringify(data),
       });
       const json = await res.json();
+
       if (!res.ok) {
-        setApiError(json?.message || 'Invalid email or password');
+        // Detailed classification of errors
+        if (res.status === 401) {
+          setApiError('Incorrect email or password. Please try again.');
+        } else if (res.status === 500) {
+          setApiError('Something went wrong on our end. Please try again later.');
+        } else {
+          setApiError(json?.message || 'Unable to sign in. Please check your credentials.');
+        }
         setLoading(false);
         return;
       }
 
-      // Store token as a fallback (and for "pass to server")
+      // Update Auth Context IMMEDIATELY
+      if (json.user) {
+        setUser(json.user);
+      }
+
+      // Store token as a fallback
       if (json.token) {
         localStorage.setItem('token', json.token);
       }
 
+      toast.success('Welcome back! Logging you in...', {
+        icon: <CheckCircle2 className="h-4 w-4 text-green-500" />
+      });
+
       const destination = json?.user?.isAdmin ? '/admin' : getSafeNextPath();
       router.replace(destination);
     } catch (err) {
-      setApiError('Unable to connect to the server. Please try again.');
+      setApiError('Unable to connect to the server. Please check your internet connection.');
       setLoading(false);
     }
   };
@@ -176,16 +211,32 @@ function AuthPageContent() {
         body: JSON.stringify(data),
       });
       const json = await res.json();
+
       if (!res.ok) {
-        setApiError(json?.message || 'Registration failed. This email might be already taken.');
+        if (res.status === 409) {
+          setApiError('An account already exists with this email. Try signing in instead.');
+        } else if (res.status === 400) {
+          setApiError(json?.message || 'Please check your registration details.');
+        } else {
+          setApiError('Something went wrong. Please try again later.');
+        }
         setLoading(false);
         return;
+      }
+
+      // Update Auth Context IMMEDIATELY
+      if (json.user) {
+        setUser(json.user);
       }
 
       // Store token as a fallback
       if (json.token) {
         localStorage.setItem('token', json.token);
       }
+
+      toast.success('Account created! Welcome to DomNotify.', {
+        icon: <CheckCircle2 className="h-4 w-4 text-green-500" />
+      });
 
       const destination = json?.user?.isAdmin ? '/admin' : getSafeNextPath();
       router.replace(destination);
