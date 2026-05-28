@@ -1,7 +1,8 @@
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
-import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
+import { verifyToken } from "@/lib/jwt";
+import { serializeAuthUser } from "@/lib/serializers/user";
 
 export async function PATCH(req) {
     try {
@@ -14,12 +15,12 @@ export async function PATCH(req) {
             );
         }
 
-        let decoded;
-        try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET);
-        } catch (err) {
+        // Use shared jose verifyToken — validates signature, expiry, and id format
+        const decoded = await verifyToken(token);
+
+        if (!decoded) {
             return NextResponse.json(
-                { success: false, message: "Invalid token" },
+                { success: false, message: "Invalid or expired token" },
                 { status: 401 }
             );
         }
@@ -29,7 +30,6 @@ export async function PATCH(req) {
         const body = await req.json();
         const { name, role, companyName } = body;
 
-        // Validation
         if (!name || !role) {
             return NextResponse.json(
                 { success: false, message: "Name and role are required" },
@@ -52,6 +52,7 @@ export async function PATCH(req) {
             );
         }
 
+        // decoded.id is already a validated ObjectId string
         const updatedUser = await User.findByIdAndUpdate(
             decoded.id,
             {
@@ -73,7 +74,7 @@ export async function PATCH(req) {
             {
                 success: true,
                 message: "Profile updated successfully",
-                user: updatedUser,
+                user: serializeAuthUser(updatedUser),
             },
             { status: 200 }
         );

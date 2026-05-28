@@ -69,7 +69,7 @@ export async function POST(req) {
     });
 
     // AUTO LOGIN: Generate token and set cookie
-    const token = generateToken(user);
+    const token = await generateToken(user);
 
     const response = NextResponse.json(
       {

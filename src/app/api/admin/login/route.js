@@ -72,7 +72,7 @@ export async function POST(req) {
     user.lastLogin = new Date();
     await user.save();
 
-    const token = generateToken(user);
+    const token = await generateToken(user);
 
     const response = NextResponse.json(
       {

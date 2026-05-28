@@ -1,67 +1,52 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { serializeAuthUser } from "@/lib/serializers/user";
+import { verifyToken } from "@/lib/jwt";
 
 /**
  * Admin Middleware Guard
  *
- * Purpose: Verify admin access for /admin routes and /api/admin/* endpoints
+ * Uses the shared jose-based verifyToken so the id is always
+ * coerced to a validated ObjectId string before any DB query.
  *
  * Flow:
  * 1. Extract JWT from cookies
- * 2. Verify token signature
- * 3. Fetch user from database
+ * 2. Verify token via jose (signature + expiry + id validation)
+ * 3. Fetch user from database using the safe string id
  * 4. Check isAdmin flag
  * 5. Allow if admin, deny if not
- *
- * Used by:
- * - /admin pages
- * - /api/admin/* endpoints
  */
 export async function adminGuard(req) {
   try {
     const token = req.cookies.get("token")?.value;
 
-    console.log(`[Admin Guard] Token check - token exists: ${Boolean(token)}`);
-
     if (!token) {
-      console.log(`[Admin Guard] No token found. Cookies available: ${Array.from(req.cookies).map(([k]) => k).join(', ') || 'none'}`);
-      return {
-        isAuthorized: false,
-        user: null,
-        message: "Not authenticated",
-      };
+      console.log("[Admin Guard] No token found.");
+      return { isAuthorized: false, user: null, message: "Not authenticated" };
     }
 
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(`[Admin Guard] Token verified for user: ${decoded.id}`);
-    } catch (err) {
-      console.error(`[Admin Guard] Token verification failed: ${err.message}`);
-      return {
-        isAuthorized: false,
-        user: null,
-        message: "Invalid token",
-      };
+    // verifyToken validates: signature, expiry, and coerces id to a valid string
+    const decoded = await verifyToken(token);
+
+    if (!decoded) {
+      console.error("[Admin Guard] Token verification failed or payload invalid.");
+      return { isAuthorized: false, user: null, message: "Invalid token" };
     }
+
+    console.log(`[Admin Guard] Token verified, userId: ${decoded.id}`);
 
     await connectDB();
 
+    // decoded.id is already a validated ObjectId string — safe to pass to findById
     const user = await User.findById(decoded.id).select("-password").lean();
 
     if (!user) {
-      console.error(`[Admin Guard] User not found: ${decoded.id}`);
-      return {
-        isAuthorized: false,
-        user: null,
-        message: "User not found",
-      };
+      console.error(`[Admin Guard] User not found for id: ${decoded.id}`);
+      return { isAuthorized: false, user: null, message: "User not found" };
     }
 
-    console.log(`[Admin Guard] User found: ${user.email}, isAdmin: ${user.isAdmin}`);
+    console.log(`[Admin Guard] User: ${user.email}, isAdmin: ${user.isAdmin}`);
 
     if (!user.isAdmin) {
       console.error(`[Admin Guard] User is not admin: ${user.email}`);
@@ -80,17 +65,12 @@ export async function adminGuard(req) {
     };
   } catch (error) {
     console.error("[Admin Guard] Unexpected error:", error);
-    return {
-      isAuthorized: false,
-      user: null,
-      message: "Internal server error",
-    };
+    return { isAuthorized: false, user: null, message: "Internal server error" };
   }
 }
 
 /**
- * Helper function for admin API responses
- * Returns 403 Forbidden if not admin
+ * Helper for admin API unauthorized responses
  */
 export function adminUnauthorized() {
   return NextResponse.json(

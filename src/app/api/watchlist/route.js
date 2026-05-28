@@ -1,21 +1,85 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+
 import {
   ensureDb,
   syncDomainWhois,
-  checkDomainSSL
+  checkDomainSSL,
 } from '@/lib/domainService';
-import { computeDomainStatus, parseRenewalPrice, serializeDomain } from '@/lib/domainHelpers';
+
+import {
+  computeDomainStatus,
+  parseRenewalPrice,
+  serializeDomain,
+} from '@/lib/domainHelpers';
+
 import Domain from '@/models/Domain';
 
+/**
+ * Normalize registrar payload from WHOIS providers.
+ * Supports:
+ * - string registrar
+ * - object registrar
+ */
+function normalizeRegistrar(registrar) {
+  if (!registrar) {
+    return 'Unknown';
+  }
+
+  if (typeof registrar === 'string') {
+    return registrar;
+  }
+
+  if (typeof registrar === 'object') {
+    return registrar.name || 'Unknown';
+  }
+
+  return 'Unknown';
+}
+
+/**
+ * Normalize expiry date safely.
+ */
+function normalizeExpiryDate(expiryDate) {
+  if (!expiryDate) {
+    return null;
+  }
+
+  const parsed = new Date(expiryDate);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed;
+}
+
+/**
+ * Validate domain format.
+ */
+function validateDomain(domain) {
+  return /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(
+    domain
+  );
+}
+
+/**
+ * GET WATCHLIST
+ */
 export async function GET(req) {
   try {
     const auth = requireAuth(req);
-    if (auth.error) return auth.error;
+
+    if (auth.error) {
+      return auth.error;
+    }
 
     await ensureDb();
 
-    const domains = await Domain.find({ user: auth.userId, watchlist: true })
+    const domains = await Domain.find({
+      user: auth.userId,
+      watchlist: true,
+    })
       .sort({ updatedAt: -1 })
       .lean();
 
@@ -24,57 +88,120 @@ export async function GET(req) {
       domains: domains.map(serializeDomain),
     });
   } catch (error) {
-    console.error('Watchlist GET Error:', error);
+    console.error('[WATCHLIST_GET_ERROR]', error);
+
     return NextResponse.json(
-      { success: false, message: 'Failed to load watchlist' },
-      { status: 500 },
+      {
+        success: false,
+        message: 'Failed to load watchlist',
+      },
+      {
+        status: 500,
+      }
     );
   }
 }
 
+/**
+ * ADD / UPDATE WATCHLIST
+ */
 export async function POST(req) {
   try {
     const auth = requireAuth(req);
-    if (auth.error) return auth.error;
+
+    if (auth.error) {
+      return auth.error;
+    }
 
     await ensureDb();
 
     const body = await req.json();
-    const domainName = body.domainName?.trim().toLowerCase();
 
+    const domainName = body.domainName
+      ?.trim()
+      .toLowerCase();
+
+    /**
+     * Validation
+     */
     if (!domainName) {
       return NextResponse.json(
-        { success: false, message: 'Domain name is required' },
-        { status: 400 },
+        {
+          success: false,
+          message: 'Domain name is required',
+        },
+        {
+          status: 400,
+        }
       );
     }
 
-    if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(domainName)) {
+    if (!validateDomain(domainName)) {
       return NextResponse.json(
-        { success: false, message: 'Invalid domain name format' },
-        { status: 400 },
+        {
+          success: false,
+          message: 'Invalid domain name format',
+        },
+        {
+          status: 400,
+        }
       );
     }
 
-    const existing = await Domain.findOne({ user: auth.userId, domainName });
+    /**
+     * Normalize payloads
+     */
+    const normalizedRegistrar =
+      normalizeRegistrar(body.registrar);
+
+    const normalizedExpiryDate =
+      normalizeExpiryDate(body.expiryDate);
+
+    const renewalPrice = parseRenewalPrice(
+      body.renewalPrice
+    );
+
+
+    // Check existing domain
+    const existing = await Domain.findOne({
+      user: auth.userId,
+      domainName,
+    });
+
+    /**
+     * UPDATE EXISTING DOMAIN
+     */
     if (existing) {
       existing.watchlist = true;
-      if (body.registrar) existing.registrar = body.registrar;
-      if (body.expiryDate) {
-        existing.expiryDate = new Date(body.expiryDate);
-        existing.status = computeDomainStatus(existing.expiryDate);
+      existing.registrar = normalizedRegistrar;
+
+      if (normalizedExpiryDate) {
+        existing.expiryDate =
+          normalizedExpiryDate;
+
+        existing.status = computeDomainStatus(
+          normalizedExpiryDate
+        );
       }
-      if (body.renewalPrice !== undefined) {
-        existing.renewalPrice = parseRenewalPrice(body.renewalPrice);
-      }
+
+      existing.renewalPrice = renewalPrice;
       existing.lastChecked = new Date();
+
       await existing.save();
 
-      // Enrich data if missing
-      if (existing.registrar === 'Unknown' || !existing.expiryDate) {
-        await syncDomainWhois(existing);
-      }
-      await checkDomainSSL(existing);
+      /**
+       * Background enrichment
+       * Non-blocking
+       */
+      Promise.allSettled([
+        syncDomainWhois(existing),
+        checkDomainSSL(existing),
+      ]).catch((error) => {
+        console.error(
+          '[WATCHLIST_BACKGROUND_UPDATE_ERROR]',
+          error
+        );
+      });
 
       return NextResponse.json({
         success: true,
@@ -83,37 +210,83 @@ export async function POST(req) {
       });
     }
 
-    const expiryDate = body.expiryDate ? new Date(body.expiryDate) : null;
+    /**
+     * CREATE NEW DOMAIN
+     */
     const domain = await Domain.create({
       user: auth.userId,
       domainName,
-      registrar: body.registrar || 'Unknown',
-      expiryDate,
-      renewalPrice: parseRenewalPrice(body.renewalPrice),
+      registrar: normalizedRegistrar,
+      expiryDate: normalizedExpiryDate,
+      renewalPrice,
       watchlist: true,
-      status: computeDomainStatus(expiryDate),
+      status: computeDomainStatus(
+        normalizedExpiryDate
+      ),
       lastChecked: new Date(),
     });
 
-    // Automatic enrichment
-    await syncDomainWhois(domain);
-    await checkDomainSSL(domain);
-
-    return NextResponse.json(
-      { success: true, domain: serializeDomain(domain), message: 'Domain added to watchlist' },
-      { status: 201 },
+    /**
+     * Instant response
+     * Background enrichment afterwards
+     */
+    const response = NextResponse.json(
+      {
+        success: true,
+        domain: serializeDomain(domain),
+        message: 'Domain added to watchlist',
+      },
+      {
+        status: 201,
+      }
     );
+
+    /**
+     * Background enrichment
+     * Non-blocking
+     */
+    Promise.allSettled([
+      syncDomainWhois(domain),
+      checkDomainSSL(domain),
+    ]).catch((error) => {
+      console.error(
+        '[WATCHLIST_BACKGROUND_CREATE_ERROR]',
+        error
+      );
+    });
+
+    return response;
   } catch (error) {
-    console.error('Watchlist POST Error:', error);
+    console.error(
+      '[WATCHLIST_POST_ERROR]',
+      error
+    );
+
+    /**
+     * Duplicate domain
+     */
     if (error.code === 11000) {
       return NextResponse.json(
-        { success: false, message: 'Domain already exists in your portfolio' },
-        { status: 409 },
+        {
+          success: false,
+          message:
+            'Domain already exists in your portfolio',
+        },
+        {
+          status: 409,
+        }
       );
     }
+
     return NextResponse.json(
-      { success: false, message: 'Failed to add domain to watchlist' },
-      { status: 500 },
+      {
+        success: false,
+        message:
+          'Failed to add domain to watchlist',
+      },
+      {
+        status: 500,
+      }
     );
   }
 }

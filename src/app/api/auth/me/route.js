@@ -1,8 +1,9 @@
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
-import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { serializeAuthUser } from "@/lib/serializers/user";
+import { verifyToken } from "@/lib/jwt";
 
 export async function GET(req) {
   try {
@@ -15,16 +16,28 @@ export async function GET(req) {
       );
     }
 
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
-      return NextResponse.json(
-        { success: false, message: "Invalid token" },
+    // Use the shared jose verifyToken — validates signature, expiry, and id format
+    const decoded = await verifyToken(token);
+
+    if (!decoded) {
+      // Clear the stale / corrupted cookie so the browser doesn't keep sending it
+      const res = NextResponse.json(
+        { success: false, message: "Invalid or expired token" },
         { status: 401 }
       );
+      res.cookies.set({
+        name: "token",
+        value: "",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 0,
+        path: "/",
+      });
+      return res;
     }
 
+    // decoded.id is already a validated ObjectId string (coerced by verifyToken)
     await connectDB();
 
     const user = await User.findById(decoded.id).select("-password").lean();
@@ -37,16 +50,11 @@ export async function GET(req) {
     }
 
     return NextResponse.json(
-      {
-        success: true,
-        user: serializeAuthUser(user),
-      },
+      { success: true, user: serializeAuthUser(user) },
       { status: 200 }
     );
   } catch (error) {
-    // Internally log the error
-    console.error("Auth Me Error:", error);
-
+    console.error("Auth /me Error:", error);
     return NextResponse.json(
       { success: false, message: "Something went wrong. Please try again." },
       { status: 500 }
