@@ -20,7 +20,7 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="fixed left-0 top-16 z-30 hidden h-[calc(100vh-4rem)] w-72 flex-col overflow-y-auto border-r border-border bg-background transition-colors duration-200 lg:flex">
+      <aside className="fixed left-0 top-16 z-30 hidden h-[calc(100vh-4rem)] w-60 flex-col overflow-y-auto border-r border-border bg-background transition-colors duration-200 lg:flex">
         <nav className="space-y-1 px-4 py-6">
           <div className="mb-6">
             <p className="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
